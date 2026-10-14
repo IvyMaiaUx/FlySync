@@ -5,6 +5,7 @@ import React, { useState, useMemo } from 'react';
 import { useFlySync } from '../../store/FlySyncContext';
 import { OfferDetailModal } from './OfferDetailModal';
 import { RouteCalendarModal } from './RouteCalendarModal';
+import { AirportSelect } from '../common/AirportSelect';
 import { PushNotificationManagerCard } from '../notifications/PushNotificationManagerCard';
 import { ErrorBoundary } from '../common/ErrorBoundary';
 import { FlightOffer } from '../../types';
@@ -352,38 +353,26 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
         {/* Row 1: Search Inputs + Filtro de Mês Integrado */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
           {/* Origin */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Origem (Aeroporto ou Cidade)
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                value={originSearch}
-                onChange={(e) => setOriginSearch(e.target.value)}
-                placeholder="Ex: GRU, GIG, São Paulo..."
-                className="w-full pl-8 pr-3 py-2 text-xs border border-purple-800/80 rounded-lg bg-[#1A0B3B] text-white focus:ring-2 focus:ring-[#22C55E] focus:outline-hidden uppercase font-mono placeholder:font-sans placeholder:normal-case placeholder:text-slate-500"
-              />
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
-            </div>
-          </div>
+          <AirportSelect
+            label="Origem (Aeroporto ou Cidade)"
+            value={originSearch}
+            onChange={setOriginSearch}
+            placeholder="Ex: GRU, GIG, São Paulo..."
+            iconType="takeoff"
+            offers={offers}
+            isOrigin={true}
+          />
 
           {/* Destination */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Destino (Aeroporto ou Cidade)
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                value={destSearch}
-                onChange={(e) => setDestSearch(e.target.value)}
-                placeholder="Ex: MIA, LIS, MAD, Paris..."
-                className="w-full pl-8 pr-3 py-2 text-xs border border-purple-800/80 rounded-lg bg-[#1A0B3B] text-white focus:ring-2 focus:ring-[#22C55E] focus:outline-hidden uppercase font-mono placeholder:font-sans placeholder:normal-case placeholder:text-slate-500"
-              />
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
-            </div>
-          </div>
+          <AirportSelect
+            label="Destino (Aeroporto ou Cidade)"
+            value={destSearch}
+            onChange={setDestSearch}
+            placeholder="Ex: MIA, LIS, MAD, Paris..."
+            iconType="landing"
+            offers={offers}
+            isOrigin={false}
+          />
 
           {/* Program */}
           <div>

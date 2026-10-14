@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useFlySync } from '../../store/FlySyncContext';
 import { Modal } from '../common/Modal';
+import { AirportSelect } from '../common/AirportSelect';
 import { CabinClass } from '../../types';
 import { PLANS } from '../../data/initialData';
 import {
@@ -34,7 +35,7 @@ export const NewSearchModal: React.FC<NewSearchModalProps> = ({
   defaultProgramId = '',
   onOpenUpgrade
 }) => {
-  const { user, programs, savedSearches, addSavedSearch, pushPermission, requestPushPermission } = useFlySync();
+  const { user, programs, offers, savedSearches, addSavedSearch, pushPermission, requestPushPermission } = useFlySync();
 
   const [title, setTitle] = useState(defaultOrigin && defaultDestination ? `${defaultOrigin} para ${defaultDestination}` : '');
   const [origin, setOrigin] = useState(defaultOrigin || 'GRU');
@@ -148,36 +149,28 @@ export const NewSearchModal: React.FC<NewSearchModalProps> = ({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Origem (IATA)
-              </label>
-              <input
-                type="text"
-                value={origin}
-                onChange={(e) => setOrigin(e.target.value.toUpperCase())}
-                placeholder="Ex: GRU"
-                maxLength={4}
-                className="w-full px-3 py-2 text-xs font-mono uppercase font-bold border border-purple-800/80 rounded-lg bg-[#180838] text-white focus:ring-2 focus:ring-[#22C55E] focus:outline-hidden"
-                required
-              />
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <AirportSelect
+              label="Origem (IATA / Cidade)"
+              value={origin}
+              onChange={(val) => setOrigin(val.toUpperCase())}
+              placeholder="Ex: GRU, GIG..."
+              iconType="takeoff"
+              offers={offers}
+              isOrigin={true}
+              required
+            />
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Destino (IATA)
-              </label>
-              <input
-                type="text"
-                value={destination}
-                onChange={(e) => setDestination(e.target.value.toUpperCase())}
-                placeholder="Ex: MIA"
-                maxLength={4}
-                className="w-full px-3 py-2 text-xs font-mono uppercase font-bold border border-purple-800/80 rounded-lg bg-[#180838] text-white focus:ring-2 focus:ring-[#22C55E] focus:outline-hidden"
-                required
-              />
-            </div>
+            <AirportSelect
+              label="Destino (IATA / Cidade)"
+              value={destination}
+              onChange={(val) => setDestination(val.toUpperCase())}
+              placeholder="Ex: MIA, LIS, REC..."
+              iconType="landing"
+              offers={offers}
+              isOrigin={false}
+              required
+            />
           </div>
 
           {/* Month Flexibility Selection (PRD 4.1) */}
