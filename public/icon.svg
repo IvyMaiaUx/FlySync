@@ -1,0 +1,220 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1F0A44" />
+      <stop offset="50%" stop-color="#13062C" />
+      <stop offset="100%" stop-color="#090218" />
+    </linearGradient>
+
+    <!-- Ticket Neon Gradient -->
+    <linearGradient id="ticketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4ADE80" />
+      <stop offset="40%" stop-color="#22C55E" />
+      <stop offset="100%" stop-color="#10B981" />
+    </linearGradient>
+
+    <!-- Jet Cyan Gradient -->
+    <linearGradient id="jetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#BAE6FD" />
+      <stop offset="30%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+
+    <!-- Trail Cyan Glow -->
+    <linearGradient id="trailGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00C6FF" stop-opacity="0.9" />
+      <stop offset="60%" stop-color="#38BDF8" stop-opacity="1" />
+      <stop offset="100%" stop-color="#E0F2FE" stop-opacity="1" />
+    </linearGradient>
+
+    <!-- Filter Glow -->
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+
+  <!-- Ambient Glow Behind Elements -->
+  <circle cx="260" cy="240" r="140" fill="#22C55E" opacity="0.18" filter="url(#softGlow)" />
+  <circle cx="310" cy="210" r="110" fill="#38BDF8" opacity="0.22" filter="url(#softGlow)" />
+
+  <!-- Sparkling Stars & Particles -->
+  <!-- Sparkle 1 Top Left -->
+  <path d="M 175 145 Q 185 145 185 135 Q 185 145 195 145 Q 185 145 185 155 Q 185 145 175 145 Z" fill="#4ADE80" filter="url(#neonGlow)" />
+  <!-- Sparkle 2 Bottom Right -->
+  <path d="M 335 260 Q 345 260 345 250 Q 345 260 355 260 Q 345 260 345 270 Q 345 260 335 260 Z" fill="#4ADE80" filter="url(#neonGlow)" />
+  <!-- Sparkle 3 Ambient Dots -->
+  <circle cx="215" cy="115" r="4.5" fill="#38BDF8" opacity="0.8" />
+  <circle cx="150" cy="130" r="3" fill="#A7F3D0" opacity="0.7" />
+  <circle cx="110" cy="225" r="4" fill="#38BDF8" opacity="0.75" />
+  <circle cx="158" cy="172" r="3.5" fill="#38BDF8" opacity="0.9" />
+  <circle cx="295" cy="285" r="5" fill="#38BDF8" opacity="0.8" />
+  <circle cx="370" cy="280" r="3.5" fill="#A7F3D0" opacity="0.75" />
+
+  <!-- Center Composition Group -->
+  <g transform="translate(256, 235)">
+    <!-- TICKET (Rotated -32 deg) -->
+    <g transform="rotate(-32)">
+      <!-- Ticket Drop Shadow / Glow -->
+      <rect x="-125" y="-72" width="250" height="144" rx="28" fill="#15803D" opacity="0.4" transform="translate(0, 10)" filter="url(#softGlow)" />
+      
+      <!-- Ticket Body with notches -->
+      <path d="
+        M -97 -72 
+        L 97 -72 
+        A 28 28 0 0 1 125 -44 
+        L 125 -18 
+        A 18 18 0 0 0 125 18 
+        L 125 44 
+        A 28 28 0 0 1 97 72 
+        L -97 72 
+        A 28 28 0 0 1 -125 44 
+        L -125 18 
+        A 18 18 0 0 0 -125 -18 
+        L -125 -44 
+        A 28 28 0 0 1 -97 -72 
+        Z" 
+        fill="url(#ticketGrad)" 
+      />
+
+      <!-- Ticket Internal Graphics (% Discount Markings in deep indigo/purple) -->
+      <!-- Top circle of % -->
+      <circle cx="-42" cy="-22" r="16" fill="none" stroke="#13062C" stroke-width="11" stroke-linecap="round" />
+      <!-- Diagonal divider line -->
+      <line x1="-32" y1="36" x2="36" y2="-36" stroke="#13062C" stroke-width="12" stroke-linecap="round" />
+      <!-- Bottom circle of % -->
+      <circle cx="40" cy="22" r="16" fill="none" stroke="#13062C" stroke-width="11" stroke-linecap="round" />
+
+      <!-- Dashed tear-off line on right edge -->
+      <line x1="82" y1="-50" x2="82" y2="50" stroke="#13062C" stroke-width="5" stroke-dasharray="7 8" opacity="0.35" stroke-linecap="round" />
+    </g>
+
+    <!-- JET ORBITAL SWOOP TRAIL -->
+    <!-- The swooping tail from bottom left curving behind the wing and up to the jet -->
+    <path d="
+      M -150 48
+      C -165 20, -145 -15, -95 -20
+      C -30 -25, 40 10, 85 -30
+      C 105 -50, 125 -80, 145 -100
+      L 138 -92
+      C 115 -72, 95 -45, 75 -25
+      C 30 18, -40 -12, -90 -8
+      C -130 -5, -145 22, -135 48
+      Z" 
+      fill="url(#trailGrad)" 
+      filter="url(#neonGlow)"
+    />
+
+    <!-- THE AIRPLANE (Flying towards top right at ~38 deg angle) -->
+    <g transform="translate(18, -25) rotate(38)">
+      <!-- Airplane Body & Wings -->
+      <!-- Main Fuselage -->
+      <path d="
+        M 0 -85
+        C 5 -85, 11 -70, 12 -40
+        L 13 40
+        L 7 68
+        L 0 74
+        L -7 68
+        L -13 40
+        L -12 -40
+        C -11 -70, -5 -85, 0 -85
+        Z" 
+        fill="url(#jetGrad)" 
+      />
+
+      <!-- Fuselage Specular Highlight Centerline -->
+      <path d="
+        M 0 -80 
+        L 2 -30
+        L 2 55
+        L 0 70
+        L -1 55
+        L -1 -30
+        Z" 
+        fill="#FFFFFF" 
+        opacity="0.85" 
+      />
+
+      <!-- Swept Wings -->
+      <!-- Right Wing -->
+      <path d="
+        M 12 -12 
+        L 95 18 
+        L 90 28 
+        L 12 10 
+        Z" 
+        fill="url(#jetGrad)" 
+      />
+      <!-- Right Wing Upper Highlight -->
+      <path d="
+        M 12 -10 
+        L 92 19 
+        L 80 23 
+        L 12 4 
+        Z" 
+        fill="#BAE6FD" 
+        opacity="0.9" 
+      />
+
+      <!-- Left Wing -->
+      <path d="
+        M -12 -12 
+        L -95 18 
+        L -90 28 
+        L -12 10 
+        Z" 
+        fill="url(#jetGrad)" 
+      />
+      <!-- Left Wing Highlight -->
+      <path d="
+        M -12 -10 
+        L -92 19 
+        L -80 23 
+        L -12 4 
+        Z" 
+        fill="#38BDF8" 
+        opacity="0.75" 
+      />
+
+      <!-- Tail Wing / Horizontal Stabilizers -->
+      <path d="
+        M 0 54 
+        L 34 68 
+        L 32 74 
+        L 0 68 
+        L -32 74 
+        L -34 68 
+        Z" 
+        fill="#0284C7" 
+      />
+
+      <!-- Vertical Fin -->
+      <path d="
+        M 0 35 
+        L 0 66 
+        L 4 60 
+        L 4 40 
+        Z" 
+        fill="#BAE6FD" 
+      />
+    </g>
+  </g>
+
+  <!-- FlySync Wordmark Bottom -->
+  <g transform="translate(256, 430)">
+    <!-- Fly in White -->
+    <text x="-4" y="0" text-anchor="end" font-family="'Bricolage Grotesque', system-ui, sans-serif" font-weight="900" font-size="64" fill="#FFFFFF" letter-spacing="-1">Fly</text>
+    <!-- Sync in Neon Green -->
+    <text x="0" y="0" text-anchor="start" font-family="'Bricolage Grotesque', system-ui, sans-serif" font-weight="900" font-size="64" fill="#22C55E" letter-spacing="-1">Sync</text>
+  </g>
+</svg>

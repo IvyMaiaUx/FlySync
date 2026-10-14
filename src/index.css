@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Bricolage Grotesque', 'Geist', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    color: #f8fafc;
+    background-color: #090218;
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  .font-mono, .tabular-nums {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Safe Area Inset for Mobile Notch & PWA Home Indicators */
+.safe-area-inset-bottom {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+/* Cosmic Brand Aura & Glow Utilities mirroring Logo */
+.cosmic-glow-green {
+  box-shadow: 0 0 25px -3px rgba(34, 197, 94, 0.4);
+}
+
+.cosmic-glow-cyan {
+  box-shadow: 0 0 25px -3px rgba(56, 189, 248, 0.4);
+}
+
+.cosmic-glow-purple {
+  box-shadow: 0 0 35px -5px rgba(124, 58, 237, 0.35);
+}
+
+.cosmic-gradient-card {
+  background: linear-gradient(135deg, rgba(31, 10, 68, 0.95) 0%, rgba(19, 6, 44, 0.98) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+/* Neon Starlight Pulse */
+@keyframes starlightPulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.animate-starlight {
+  animation: starlightPulse 3s ease-in-out infinite;
+}
