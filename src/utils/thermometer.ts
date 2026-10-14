@@ -3,10 +3,10 @@
  * Baseado no Guia Oficial de Referência (março/2026)
  *
  * Avalia oportunidades em 4 faixas:
- * - 🔥 Excelente
- * - ✅ Bom
- * - ⚠️ Normal
- * - ❌ Ruim
+ * - 🔥 Excelente (única faixa com emoji de destaque)
+ * - Bom
+ * - Normal
+ * - Ruim
  */
 
 export type DealRating = 'excellent' | 'good' | 'normal' | 'bad';
@@ -236,7 +236,7 @@ export function evaluateDeal(
     return {
       rating: 'good',
       label: 'Bom Preço',
-      emoji: '✅',
+      emoji: '',
       badgeBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
       badgeText: 'text-emerald-600 dark:text-emerald-400',
       border: 'border-emerald-500',
@@ -251,7 +251,7 @@ export function evaluateDeal(
     return {
       rating: 'normal',
       label: 'Preço Normal',
-      emoji: '⚠️',
+      emoji: '',
       badgeBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
       badgeText: 'text-amber-600 dark:text-amber-400',
       border: 'border-amber-500',
@@ -265,7 +265,7 @@ export function evaluateDeal(
   return {
     rating: 'bad',
     label: 'Tarifa Alta',
-    emoji: '❌',
+    emoji: '',
     badgeBg: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/30',
     badgeText: 'text-slate-600 dark:text-slate-400',
     border: 'border-slate-500',

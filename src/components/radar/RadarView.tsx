@@ -785,7 +785,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
                                 className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full border flex items-center gap-1 ${deal.badgeBg}`}
                                 title={deal.description}
                               >
-                                <span>{deal.emoji}</span>
+                                {deal.emoji && <span>{deal.emoji}</span>}
                                 <span>{deal.label}</span>
                               </span>
                             );

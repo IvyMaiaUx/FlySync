@@ -137,9 +137,9 @@ export const EconomilhaWidget: React.FC<EconomilhaWidgetProps> = ({ offer }) => 
 
       {/* Banner de Decisão do Termômetro */}
       <div className={`p-3 rounded-xl border flex items-center gap-3 ${analysis.verdictBadge}`}>
-        <div className="text-xl shrink-0">
-          {analysis.verdict === 'super_deal' ? '🔥' : analysis.verdict === 'good_deal' ? '✅' : analysis.verdict === 'fair_deal' ? '⚠️' : '❌'}
-        </div>
+        {analysis.verdict === 'super_deal' && (
+          <div className="text-xl shrink-0">🔥</div>
+        )}
         <div className="space-y-0.5">
           <h5 className="text-xs font-black uppercase tracking-wider">{analysis.verdictLabel}</h5>
           <p className="text-xs font-medium opacity-95">{analysis.verdictMessage}</p>

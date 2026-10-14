@@ -331,7 +331,7 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
             <div className="p-4 sm:p-5 rounded-2xl bg-[#13062C] border border-purple-900/70 space-y-3">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-2xl">{deal.emoji}</span>
+                  {deal.emoji && <span className="text-2xl">{deal.emoji}</span>}
                   <div>
                     <div className="flex items-center gap-2">
                       <h4 className="text-xs sm:text-sm font-bold text-white">Termômetro de Milhas FlySync</h4>
@@ -364,7 +364,7 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                       ? 'bg-emerald-500/25 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500 shadow-[0_0_12px_rgba(34,197,94,0.3)]'
                       : 'bg-purple-950/40 border-purple-900/60 text-slate-400 opacity-60'
                   }`}>
-                    <div className="font-extrabold flex items-center justify-center gap-1">✅ Bom</div>
+                    <div className="font-extrabold flex items-center justify-center gap-1">Bom</div>
                     <div className="font-mono text-[11px] mt-0.5 font-bold">até {Math.round(deal.maxGood / 1000)}k</div>
                   </div>
 
@@ -373,7 +373,7 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                       ? 'bg-amber-500/25 border-amber-500 text-amber-300 ring-1 ring-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.3)]'
                       : 'bg-purple-950/40 border-purple-900/60 text-slate-400 opacity-60'
                   }`}>
-                    <div className="font-extrabold flex items-center justify-center gap-1">⚠️ Normal</div>
+                    <div className="font-extrabold flex items-center justify-center gap-1">Normal</div>
                     <div className="font-mono text-[11px] mt-0.5 font-bold">até {Math.round(deal.maxNormal / 1000)}k</div>
                   </div>
 
@@ -382,7 +382,7 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                       ? 'bg-slate-500/25 border-slate-500 text-slate-300 ring-1 ring-slate-500 shadow-md'
                       : 'bg-purple-950/40 border-purple-900/60 text-slate-400 opacity-60'
                   }`}>
-                    <div className="font-extrabold flex items-center justify-center gap-1">❌ Ruim</div>
+                    <div className="font-extrabold flex items-center justify-center gap-1">Ruim</div>
                     <div className="font-mono text-[11px] mt-0.5 font-bold">&gt; {Math.round(deal.maxNormal / 1000)}k</div>
                   </div>
                 </div>

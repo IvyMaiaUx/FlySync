@@ -121,17 +121,17 @@ export function analyzeOfferEconomilha(
   } else if (savedPercent >= 15) {
     verdict = 'good_deal';
     verdictBadge = 'bg-teal-500/20 text-teal-300 border-teal-500/40';
-    verdictLabel = '✅ Compensa com Milhas';
+    verdictLabel = 'Compensa com Milhas';
     verdictMessage = `Bom negócio: você economiza R$ ${savedReais.toLocaleString('pt-BR')} (${savedPercent}% OFF). Vale a emissão!`;
   } else if (savedPercent >= 0) {
     verdict = 'fair_deal';
     verdictBadge = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
-    verdictLabel = '⚠️ Empate Técnico';
+    verdictLabel = 'Empate Técnico';
     verdictMessage = `O custo em milhas está próximo do preço pagante em dinheiro. Só compensa se suas milhas estiverem prestes a expirar.`;
   } else {
     verdict = 'cash_better';
     verdictBadge = 'bg-rose-500/20 text-rose-300 border-rose-500/40';
-    verdictLabel = '❌ Melhor Pagar em Dinheiro';
+    verdictLabel = 'Melhor Pagar em Dinheiro';
     verdictMessage = `Nesta data o resgate em milhas está inflacionado. Comprar a passagem em dinheiro sai mais vantajoso!`;
   }
 
