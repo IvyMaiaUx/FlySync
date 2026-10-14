@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { useFlySync } from '../../store/FlySyncContext';
 import { Modal } from '../common/Modal';
 import { FlightOffer } from '../../types';
+import { getEffectiveBookingUrl } from '../../utils/bookingUrls';
 import {
   Calendar,
   Plane,
@@ -124,7 +125,8 @@ export const RouteCalendarModal: React.FC<RouteCalendarModalProps> = ({
 
   const handleBookingClick = (offer: FlightOffer) => {
     trackOutboundClick(offer.id);
-    window.open(offer.bookingUrl, '_blank', 'noopener,noreferrer');
+    const targetUrl = getEffectiveBookingUrl(offer);
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
