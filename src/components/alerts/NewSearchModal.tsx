@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useFlySync } from '../../store/FlySyncContext';
 import { Modal } from '../common/Modal';
 import { AirportSelect } from '../common/AirportSelect';
-import { CabinClass } from '../../types';
+import { CabinClass, TripType } from '../../types';
 import { PLANS } from '../../data/initialData';
 import {
   Sparkles,
@@ -13,7 +13,9 @@ import {
   Smartphone,
   Calendar,
   CheckCircle2,
-  Zap
+  Zap,
+  ArrowRight,
+  ArrowLeftRight
 } from 'lucide-react';
 
 interface NewSearchModalProps {
@@ -43,6 +45,7 @@ export const NewSearchModal: React.FC<NewSearchModalProps> = ({
   const [maxMiles, setMaxMiles] = useState(defaultMaxMiles || 50000);
   const [programId, setProgramId] = useState(defaultProgramId || '');
   const [cabinClass, setCabinClass] = useState<CabinClass | ''>('');
+  const [tripType, setTripType] = useState<TripType>('one_way');
   const [departureMonth, setDepartureMonth] = useState<string>(''); // e.g. '2026-11' or empty for any
   const [channels, setChannels] = useState<{ push: boolean }>({
     push: true
@@ -147,6 +150,39 @@ export const NewSearchModal: React.FC<NewSearchModalProps> = ({
               placeholder="Ex: Minhas férias em Miami / Sweet spot Madri"
               className="w-full px-3 py-2 text-xs border border-purple-800/80 rounded-lg bg-[#180838] text-white focus:ring-2 focus:ring-[#22C55E] focus:outline-hidden placeholder:text-slate-500"
             />
+          </div>
+
+          {/* Seletor Tipo de Viagem */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              Tipo de Viagem
+            </label>
+            <div className="grid grid-cols-2 gap-2 bg-[#0F0324] p-1 rounded-xl border border-purple-900/60">
+              <button
+                type="button"
+                onClick={() => setTripType('one_way')}
+                className={`py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                  tripType === 'one_way'
+                    ? 'bg-[#22C55E] text-slate-950 font-black shadow-md'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>Só Ida</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setTripType('round_trip')}
+                className={`py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                  tripType === 'round_trip'
+                    ? 'bg-[#22C55E] text-slate-950 font-black shadow-md'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <ArrowLeftRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>Ida e Volta</span>
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

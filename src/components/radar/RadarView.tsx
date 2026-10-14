@@ -21,6 +21,7 @@ import {
   MapPin,
   TrendingDown,
   ArrowRight,
+  ArrowLeftRight,
   Bell,
   BellRing,
   Flame,
@@ -350,8 +351,55 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
 
       {/* Filter Toolbar */}
       <div className="p-4 sm:p-5 rounded-2xl bg-[#13062C] border border-purple-900/60 shadow-xl space-y-4">
+        {/* Seletor Rápido: Só Ida vs Ida e Volta vs Todas */}
+        <div className="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-purple-900/40">
+          <div className="flex items-center gap-1.5 bg-[#0F0324] p-1 rounded-xl border border-purple-900/60">
+            <button
+              type="button"
+              onClick={() => setTripType('all')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                tripType === 'all'
+                  ? 'bg-purple-900/90 text-white border border-[#22C55E]/60 shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>Todas as Viagens</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setTripType('one_way')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                tripType === 'one_way'
+                  ? 'bg-[#22C55E] text-slate-950 font-black shadow-[0_0_12px_rgba(34,197,94,0.35)]'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Só Ida</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setTripType('round_trip')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                tripType === 'round_trip'
+                  ? 'bg-[#22C55E] text-slate-950 font-black shadow-[0_0_12px_rgba(34,197,94,0.35)]'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <ArrowLeftRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Ida e Volta</span>
+            </button>
+          </div>
+
+          <div className="text-[11px] text-slate-400 font-medium">
+            Exibindo <strong>{filteredOffers.length}</strong> {filteredOffers.length === 1 ? 'tarifa' : 'tarifas'} encontradas
+          </div>
+        </div>
+
         {/* Row 1: Search Inputs + Filtro de Mês Integrado */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {/* Origin */}
           <AirportSelect
             label="Origem (Aeroporto ou Cidade)"
@@ -373,6 +421,22 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
             offers={offers}
             isOrigin={false}
           />
+
+          {/* Trip Type Select */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
+              Tipo de Viagem
+            </label>
+            <select
+              value={tripType}
+              onChange={(e) => setTripType(e.target.value)}
+              className="w-full px-3 py-2 text-xs border border-purple-800/80 rounded-lg bg-[#1A0B3B] text-white focus:ring-2 focus:ring-[#22C55E] focus:outline-hidden"
+            >
+              <option value="all" className="bg-[#13062C]">Qualquer Tipo (Todas)</option>
+              <option value="one_way" className="bg-[#13062C]">Só Ida (One-Way)</option>
+              <option value="round_trip" className="bg-[#13062C]">Ida e Volta (Round-Trip)</option>
+            </select>
+          </div>
 
           {/* Program */}
           <div>
