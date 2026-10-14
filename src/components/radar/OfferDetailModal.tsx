@@ -345,45 +345,45 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
               </div>
 
               {/* Régua de Avaliação das 4 Faixas */}
-              <div className="space-y-1.5 pt-1">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+              <div className="space-y-2.5 pt-2 border-t border-purple-900/50">
+                <span className="text-xs font-semibold text-slate-300 block">
                   Faixas de referência oficiais para esta região e cabine:
                 </span>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
-                  <div className={`p-2 rounded-xl border transition-all ${
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-center">
+                  <div className={`p-3 sm:p-3.5 rounded-xl border transition-all ${
                     deal.rating === 'excellent'
-                      ? 'bg-rose-500/25 border-rose-500 text-rose-300 ring-1 ring-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.3)]'
+                      ? 'bg-rose-500/20 border-rose-500 text-rose-300 ring-2 ring-rose-500/40 shadow-[0_0_15px_rgba(244,63,94,0.3)]'
                       : 'bg-purple-950/40 border-purple-900/60 text-slate-400 opacity-60'
                   }`}>
-                    <div className="font-extrabold flex items-center justify-center gap-1">🔥 Excelente</div>
-                    <div className="font-mono text-[11px] mt-0.5 font-bold">até {Math.round(deal.maxExcellent / 1000)}k</div>
+                    <div className="text-xs font-black">🔥 Excelente</div>
+                    <div className="font-mono text-sm sm:text-base mt-1 font-bold text-white">até {Math.round(deal.maxExcellent / 1000)}k</div>
                   </div>
 
-                  <div className={`p-2 rounded-xl border transition-all ${
+                  <div className={`p-3 sm:p-3.5 rounded-xl border transition-all ${
                     deal.rating === 'good'
-                      ? 'bg-emerald-500/25 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500 shadow-[0_0_12px_rgba(34,197,94,0.3)]'
+                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 ring-2 ring-emerald-500/40 shadow-[0_0_15px_rgba(34,197,94,0.3)]'
                       : 'bg-purple-950/40 border-purple-900/60 text-slate-400 opacity-60'
                   }`}>
-                    <div className="font-extrabold flex items-center justify-center gap-1">Bom</div>
-                    <div className="font-mono text-[11px] mt-0.5 font-bold">até {Math.round(deal.maxGood / 1000)}k</div>
+                    <div className="text-xs font-bold">Bom</div>
+                    <div className="font-mono text-sm sm:text-base mt-1 font-bold text-white">até {Math.round(deal.maxGood / 1000)}k</div>
                   </div>
 
-                  <div className={`p-2 rounded-xl border transition-all ${
+                  <div className={`p-3 sm:p-3.5 rounded-xl border transition-all ${
                     deal.rating === 'normal'
-                      ? 'bg-amber-500/25 border-amber-500 text-amber-300 ring-1 ring-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.3)]'
+                      ? 'bg-amber-500/20 border-amber-500 text-amber-300 ring-2 ring-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.3)]'
                       : 'bg-purple-950/40 border-purple-900/60 text-slate-400 opacity-60'
                   }`}>
-                    <div className="font-extrabold flex items-center justify-center gap-1">Normal</div>
-                    <div className="font-mono text-[11px] mt-0.5 font-bold">até {Math.round(deal.maxNormal / 1000)}k</div>
+                    <div className="text-xs font-bold">Normal</div>
+                    <div className="font-mono text-sm sm:text-base mt-1 font-bold text-white">até {Math.round(deal.maxNormal / 1000)}k</div>
                   </div>
 
-                  <div className={`p-2 rounded-xl border transition-all ${
+                  <div className={`p-3 sm:p-3.5 rounded-xl border transition-all ${
                     deal.rating === 'bad'
-                      ? 'bg-slate-500/25 border-slate-500 text-slate-300 ring-1 ring-slate-500 shadow-md'
+                      ? 'bg-slate-500/20 border-slate-500 text-slate-300 ring-1 ring-slate-500 shadow-md'
                       : 'bg-purple-950/40 border-purple-900/60 text-slate-400 opacity-60'
                   }`}>
-                    <div className="font-extrabold flex items-center justify-center gap-1">Ruim</div>
-                    <div className="font-mono text-[11px] mt-0.5 font-bold">&gt; {Math.round(deal.maxNormal / 1000)}k</div>
+                    <div className="text-xs font-bold">Ruim</div>
+                    <div className="font-mono text-sm sm:text-base mt-1 font-bold text-slate-300">&gt; {Math.round(deal.maxNormal / 1000)}k</div>
                   </div>
                 </div>
               </div>

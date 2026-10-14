@@ -268,10 +268,16 @@ export const CampaignsView: React.FC = () => {
                   {camp.description}
                 </p>
 
-                {/* Highlights Pill */}
-                <div className="p-2.5 rounded-xl bg-purple-950/70 border border-purple-800/60 mb-3 flex items-center justify-between text-xs">
-                  <span className="text-purple-300">Regra Principal:</span>
-                  <span className="font-bold text-emerald-400">{camp.termsSummary || camp.badgeText || 'Regras no canal parceiro'}</span>
+                {/* Regra Principal Box */}
+                <div className="p-3.5 sm:p-4 rounded-xl bg-[#180938] border border-purple-800/70 mb-3.5 space-y-1.5 shadow-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-purple-300 px-2 py-0.5 rounded-md bg-purple-900/60 border border-purple-700/60">
+                      Regra Principal
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-[13px] font-semibold text-emerald-300 leading-relaxed">
+                    {camp.termsSummary || camp.badgeText || 'Consulte as regras detalhadas no canal parceiro oficial.'}
+                  </p>
                 </div>
 
                 {/* Validity and Affiliate Disclosure */}
