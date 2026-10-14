@@ -32,6 +32,14 @@ begin
     return jsonb_build_object('success', false, 'error', 'Origem e destino são obrigatórios');
   end if;
 
+  -- Rejeita datas passadas
+  if (p_offer->>'departure_date') is null or (p_offer->>'departure_date')::date < current_date then
+    return jsonb_build_object('success', false, 'error', 'Data de partida deve ser no futuro');
+  end if;
+
+  -- Purga automaticamente ofertas vencidas
+  delete from public.offers where departure_date < current_date;
+
   if v_external_id is null or v_external_id = '' then
     v_external_id := 'scraped-' || md5(v_origin || v_destination || (p_offer->>'departure_date') || (p_offer->>'price_miles'));
   end if;
@@ -126,3 +134,23 @@ end;
 $$;
 
 grant execute on function public.sync_scraper_offer(jsonb) to anon, authenticated, service_role;
+
+-- Função auxiliar para purgar ofertas expiradas a qualquer momento
+create or replace function public.purge_expired_offers()
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_count integer;
+begin
+  delete from public.offers where departure_date < current_date;
+  get diagnostics v_count = row_count;
+  return jsonb_build_object('success', true, 'purged_count', v_count);
+exception when others then
+  return jsonb_build_object('success', false, 'error', sqlerrm);
+end;
+$$;
+
+grant execute on function public.purge_expired_offers() to anon, authenticated, service_role;

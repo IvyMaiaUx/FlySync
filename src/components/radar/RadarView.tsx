@@ -72,9 +72,10 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
 
   // Extract all unique months available across offers for quick pill filtering
   const availableMonths = useMemo(() => {
+    const todayStr = new Date().toISOString().split('T')[0];
     const map = new Map<string, { label: string; count: number }>();
     offers.forEach(o => {
-      if (o.status !== 'ativa') return;
+      if (o.status !== 'ativa' || o.departureDate < todayStr) return;
       const parts = o.departureDate.split('-');
       if (parts.length >= 2) {
         const key = `${parts[0]}-${parts[1]}`;
@@ -115,8 +116,10 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
 
   // Filtered & Sorted Offers
   const filteredOffers = useMemo(() => {
+    const todayStr = new Date().toISOString().split('T')[0];
     return offers.filter((offer) => {
       if (offer.status !== 'ativa') return false;
+      if (offer.departureDate < todayStr) return false;
 
       // Origin filter
       if (originSearch.trim()) {
@@ -239,7 +242,8 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
 
   // Count available offers for a specific route
   const getRouteOfferCount = (origin: string, dest: string) => {
-    return offers.filter(o => o.origin === origin && o.destination === dest && o.status === 'ativa').length;
+    const todayStr = new Date().toISOString().split('T')[0];
+    return offers.filter(o => o.origin === origin && o.destination === dest && o.status === 'ativa' && o.departureDate >= todayStr).length;
   };
 
   const formatDate = (dateStr: string) => {

@@ -43,8 +43,9 @@ export const RouteCalendarModal: React.FC<RouteCalendarModalProps> = ({
   // Get all offers for this route
   const routeOffers = useMemo(() => {
     if (!origin || !destination) return [];
+    const todayStr = new Date().toISOString().split('T')[0];
     return offers
-      .filter(o => o.origin === origin && o.destination === destination && o.status === 'ativa')
+      .filter(o => o.origin === origin && o.destination === destination && o.status === 'ativa' && o.departureDate >= todayStr)
       .sort((a, b) => new Date(a.departureDate).getTime() - new Date(b.departureDate).getTime());
   }, [offers, origin, destination]);
 

@@ -189,9 +189,15 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!isSupabaseConfigured) return;
 
     try {
+      const todayStr = new Date().toISOString().split('T')[0];
       const [progRes, offRes, obsRes] = await Promise.all([
         supabase.from('programs').select('*').order('name'),
-        supabase.from('offers').select('*').order('created_at', { ascending: false }).limit(200),
+        supabase
+          .from('offers')
+          .select('*')
+          .gte('departure_date', todayStr)
+          .order('departure_date', { ascending: true })
+          .limit(200),
         supabase.from('offer_observations').select('*').order('observed_at', { ascending: true }).limit(500)
       ]);
 
@@ -199,7 +205,8 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setPrograms(progRes.data.map(toProgram));
       }
       if (offRes.data && offRes.data.length > 0) {
-        setOffers(offRes.data.map(toOffer));
+        const futureOffers = offRes.data.map(toOffer).filter(o => o.departureDate >= todayStr);
+        setOffers(futureOffers);
       }
       if (obsRes.data && obsRes.data.length > 0) {
         setObservations(obsRes.data.map(toObservation));
@@ -314,12 +321,19 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const offersChannel = supabase
       .channel('public-offers-stream')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, (payload) => {
+        const todayStr = new Date().toISOString().split('T')[0];
         if (payload.eventType === 'INSERT') {
           const fresh = toOffer(payload.new);
-          setOffers(prev => upsertById(prev, fresh));
+          if (fresh.departureDate >= todayStr) {
+            setOffers(prev => upsertById(prev, fresh));
+          }
         } else if (payload.eventType === 'UPDATE') {
           const updated = toOffer(payload.new);
-          setOffers(prev => prev.map(o => o.id === updated.id ? updated : o));
+          if (updated.departureDate >= todayStr) {
+            setOffers(prev => prev.map(o => o.id === updated.id ? updated : o));
+          } else {
+            setOffers(prev => prev.filter(o => o.id !== updated.id));
+          }
         } else if (payload.eventType === 'DELETE') {
           const oldId = payload.old.id;
           setOffers(prev => prev.filter(o => o.id !== oldId));

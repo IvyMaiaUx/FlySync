@@ -62,8 +62,9 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
   // All offers for this specific origin ➔ destination route
   const routeOffers = useMemo(() => {
     if (!current) return [];
+    const todayStr = new Date().toISOString().split('T')[0];
     return offers
-      .filter(o => o.origin === current.origin && o.destination === current.destination && o.status === 'ativa')
+      .filter(o => o.origin === current.origin && o.destination === current.destination && o.status === 'ativa' && o.departureDate >= todayStr)
       .sort((a, b) => new Date(a.departureDate).getTime() - new Date(b.departureDate).getTime());
   }, [offers, current]);
 
