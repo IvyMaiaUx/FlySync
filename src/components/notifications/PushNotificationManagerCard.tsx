@@ -56,8 +56,8 @@ export const PushNotificationManagerCard: React.FC<PushNotificationManagerCardPr
 
   if (compact) {
     return (
-      <div className="p-3.5 rounded-2xl bg-[#13062C]/90 border border-purple-900/60 shadow-lg flex items-center justify-between gap-3 text-white">
-        <div className="flex items-center gap-2.5">
+      <div className="p-3 sm:p-3.5 rounded-2xl bg-[#13062C]/90 border border-purple-900/60 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-white">
+        <div className="flex items-center gap-2.5 min-w-0">
           <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
             pushPermission === 'granted'
               ? 'bg-[#22C55E]/20 text-[#22C55E] border border-emerald-500/40'
@@ -70,8 +70,8 @@ export const PushNotificationManagerCard: React.FC<PushNotificationManagerCardPr
             )}
           </div>
 
-          <div>
-            <div className="flex items-center gap-1.5">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-xs font-bold text-white">
                 Alertas Push no Radar:
               </span>
@@ -85,7 +85,7 @@ export const PushNotificationManagerCard: React.FC<PushNotificationManagerCardPr
                 {pushPermission === 'granted' ? 'Ativo em Tempo Real' : pushPermission === 'denied' ? 'Bloqueado' : 'Pendente'}
               </span>
             </div>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-[11px] text-slate-400 block truncate">
               {pushPermission === 'granted'
                 ? `${activePushRoutes} ${activePushRoutes === 1 ? 'rota monitorada' : 'rotas monitoradas'} com alertas instantâneos`
                 : 'Receba avisos imediatos de baixas de tarifas no seu celular'}
@@ -93,11 +93,11 @@ export const PushNotificationManagerCard: React.FC<PushNotificationManagerCardPr
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
           {pushPermission !== 'granted' && (
             <button
               onClick={handleQuickPermission}
-              className="px-3 py-1.5 text-xs font-bold text-slate-950 bg-[#22C55E] hover:bg-emerald-400 rounded-lg shadow-xs transition-colors flex items-center gap-1"
+              className="px-3 py-1.5 text-xs font-bold text-slate-950 bg-[#22C55E] hover:bg-emerald-400 rounded-lg shadow-xs transition-colors flex items-center gap-1 cursor-pointer"
             >
               <Zap className="w-3.5 h-3.5 fill-slate-950" />
               <span>Ativar Push</span>
@@ -106,7 +106,7 @@ export const PushNotificationManagerCard: React.FC<PushNotificationManagerCardPr
 
           <button
             onClick={() => setIsPushModalOpen(true)}
-            className="px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-[#1A0B3B] hover:bg-purple-900/40 border border-purple-800/60 rounded-lg transition-colors flex items-center gap-1"
+            className="px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-[#1A0B3B] hover:bg-purple-900/40 border border-purple-800/60 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
             title="Gerenciar rotas e permissões de push"
           >
             <Sliders className="w-3.5 h-3.5 text-[#38BDF8]" />

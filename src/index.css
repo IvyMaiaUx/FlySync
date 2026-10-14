@@ -7,6 +7,13 @@
 }
 
 @layer base {
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
+    touch-action: manipulation;
+  }
+
   body {
     font-family: var(--font-sans);
     color: #f8fafc;

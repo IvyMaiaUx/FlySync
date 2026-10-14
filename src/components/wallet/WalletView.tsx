@@ -114,61 +114,68 @@ export const WalletView: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
-          <button
-            onClick={() => {
-              const el = document.getElementById('expert-tips');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-200 bg-[#160833] border border-emerald-500/40 hover:bg-emerald-950/40 hover:text-white rounded-lg transition-colors flex items-center gap-1.5 shadow-[0_0_10px_rgba(34,197,94,0.15)]"
-          >
-            <Lightbulb className="w-3.5 h-3.5 text-[#22C55E]" />
-            <span>Dicas de Especialista</span>
-          </button>
-          <button
-            onClick={() => {
-              const el = document.getElementById('rewards-badges');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-200 bg-[#160833] border border-purple-800/60 hover:bg-purple-900/40 hover:text-white rounded-lg transition-colors flex items-center gap-1.5"
-          >
-            <Award className="w-3.5 h-3.5 text-[#22C55E]" />
-            <span>Conquistas</span>
-          </button>
-          <button
-            onClick={() => {
-              const el = document.getElementById('monthly-trends');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-200 bg-[#160833] border border-purple-800/60 hover:bg-purple-900/40 hover:text-white rounded-lg transition-colors flex items-center gap-1.5"
-          >
-            <TrendingUp className="w-3.5 h-3.5 text-[#38BDF8]" />
-            <span>Evolução</span>
-          </button>
-          <button
-            onClick={() => {
-              const el = document.getElementById('miles-calculator');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-200 bg-[#160833] border border-purple-800/60 hover:bg-purple-900/40 hover:text-white rounded-lg transition-colors flex items-center gap-1.5"
-          >
-            <Calculator className="w-3.5 h-3.5 text-purple-400" />
-            <span>Calculadora</span>
-          </button>
-          <button
-            onClick={handleOpenAllHistory}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-[#160833] border border-purple-800/60 hover:bg-purple-900/40 hover:text-white rounded-lg transition-colors flex items-center gap-1.5"
-          >
-            <History className="w-3.5 h-3.5 text-slate-400" />
-            <span>Histórico</span>
-          </button>
-          <button
-            onClick={handleOpenAdd}
-            className="px-4 py-2 text-xs font-bold text-slate-950 bg-[#22C55E] hover:bg-emerald-400 rounded-lg shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all flex items-center gap-1.5"
-          >
-            <Plus className="w-4 h-4 stroke-[2.5]" />
-            <span>Adicionar Saldo</span>
-          </button>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
+          {/* Quick jump pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none -mx-3 px-3 sm:mx-0 sm:px-0 sm:flex-wrap">
+            <button
+              onClick={() => {
+                const el = document.getElementById('expert-tips');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="px-2.5 py-1.5 text-xs font-semibold text-slate-200 bg-[#160833] border border-emerald-500/40 hover:bg-emerald-950/40 hover:text-white rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shadow-[0_0_10px_rgba(34,197,94,0.15)] shrink-0"
+            >
+              <Lightbulb className="w-3.5 h-3.5 text-[#22C55E]" />
+              <span>Dicas</span>
+            </button>
+            <button
+              onClick={() => {
+                const el = document.getElementById('rewards-badges');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="px-2.5 py-1.5 text-xs font-semibold text-slate-200 bg-[#160833] border border-purple-800/60 hover:bg-purple-900/40 hover:text-white rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0"
+            >
+              <Award className="w-3.5 h-3.5 text-[#22C55E]" />
+              <span>Conquistas</span>
+            </button>
+            <button
+              onClick={() => {
+                const el = document.getElementById('monthly-trends');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="px-2.5 py-1.5 text-xs font-semibold text-slate-200 bg-[#160833] border border-purple-800/60 hover:bg-purple-900/40 hover:text-white rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0"
+            >
+              <TrendingUp className="w-3.5 h-3.5 text-[#38BDF8]" />
+              <span>Evolução</span>
+            </button>
+            <button
+              onClick={() => {
+                const el = document.getElementById('miles-calculator');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="px-2.5 py-1.5 text-xs font-semibold text-slate-200 bg-[#160833] border border-purple-800/60 hover:bg-purple-900/40 hover:text-white rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0"
+            >
+              <Calculator className="w-3.5 h-3.5 text-purple-400" />
+              <span>Calculadora</span>
+            </button>
+          </div>
+
+          {/* Primary Action Buttons */}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <button
+              onClick={handleOpenAllHistory}
+              className="px-3 py-2 text-xs font-semibold text-slate-300 bg-[#160833] border border-purple-800/60 hover:bg-purple-900/40 hover:text-white rounded-lg transition-colors flex items-center justify-center gap-1.5 shrink-0"
+            >
+              <History className="w-3.5 h-3.5 text-slate-400" />
+              <span className="hidden sm:inline">Histórico</span>
+            </button>
+            <button
+              onClick={handleOpenAdd}
+              className="flex-1 sm:flex-initial px-4 py-2 text-xs font-bold text-slate-950 bg-[#22C55E] hover:bg-emerald-400 rounded-lg shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <span>Adicionar Saldo</span>
+            </button>
+          </div>
         </div>
       </div>
 

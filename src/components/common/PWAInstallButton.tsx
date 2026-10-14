@@ -24,8 +24,9 @@ export const PWAInstallButton: React.FC = () => {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#4ADE80] to-[#22C55E] hover:from-[#22C55E] hover:to-[#16A34A] px-3 py-1 text-slate-950 shadow-[0_0_15px_rgba(34,197,94,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98] text-left cursor-pointer"
+        className="flex items-center gap-1.5 sm:gap-2 rounded-xl bg-gradient-to-r from-[#4ADE80] to-[#22C55E] hover:from-[#22C55E] hover:to-[#16A34A] px-2 sm:px-3 py-1.5 sm:py-1 text-slate-950 shadow-[0_0_15px_rgba(34,197,94,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98] text-left cursor-pointer shrink-0"
         title="Instalar FlySync no seu dispositivo"
+        aria-label="Instalar FlySync"
       >
         {isIOS ? (
           <Smartphone className="w-3.5 h-3.5 stroke-[2.5] shrink-0" />
@@ -33,10 +34,11 @@ export const PWAInstallButton: React.FC = () => {
           <Download className="w-3.5 h-3.5 stroke-[2.5] shrink-0" />
         )}
         <div className="flex flex-col leading-tight">
-          <span className="text-xs font-black tracking-tight">
-            {isIOS ? 'Instalar no iPhone' : 'Instalar App'}
+          <span className="text-[11px] sm:text-xs font-black tracking-tight whitespace-nowrap">
+            <span className="inline sm:hidden">Instalar</span>
+            <span className="hidden sm:inline">{isIOS ? 'Instalar no iPhone' : 'Instalar App'}</span>
           </span>
-          <span className="text-[9px] font-semibold text-slate-900/90 -mt-0.5">acesso rápido</span>
+          <span className="hidden sm:inline text-[9px] font-semibold text-slate-900/90 -mt-0.5">acesso rápido</span>
         </div>
       </button>
 

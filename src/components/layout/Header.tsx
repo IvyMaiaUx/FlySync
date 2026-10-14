@@ -19,10 +19,10 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, setCurrentTab, openA
 
   return (
     <header className="sticky top-0 z-40 bg-[#100526]/95 backdrop-blur-md border-b border-purple-900/50 text-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-6 h-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between gap-2 sm:gap-6 h-16 min-w-0">
           {/* Zone 1: Brand Wordmark with Official Vector Emblem */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0">
             <button
               onClick={() => setCurrentTab('radar')}
               className="text-left focus:outline-hidden hover:opacity-95 transition-opacity"
@@ -105,7 +105,7 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, setCurrentTab, openA
           </nav>
 
           {/* Zone 3: 1 primary action or profile menu + PWA install */}
-          <div className="flex items-center gap-2.5 shrink-0 relative">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 relative">
             {/* PWA Install Button */}
             <PWAInstallButton />
 
@@ -113,7 +113,7 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, setCurrentTab, openA
             <button
               onClick={() => setIsPushModalOpen(true)}
               aria-label="Gerenciar alertas push em tempo real"
-              className={`p-2 rounded-lg transition-all flex items-center gap-1.5 text-xs font-semibold ${
+              className={`hidden sm:flex p-2 rounded-lg transition-all items-center gap-1.5 text-xs font-semibold ${
                 pushPermission === 'granted'
                   ? 'text-[#22C55E] bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30'
                   : 'text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 animate-pulse'
@@ -126,11 +126,11 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, setCurrentTab, openA
               </span>
             </button>
 
-            {/* Quick alert icon for direct access */}
+            {/* Quick alert icon for direct access on tablet/desktop */}
             <button
               onClick={() => setCurrentTab('alerts')}
               aria-label="Ver notificações de alertas"
-              className="relative p-2 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+              className="hidden sm:flex relative p-2 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
             >
               <Bell className="w-4 h-4" />
               {unreadCount > 0 && (

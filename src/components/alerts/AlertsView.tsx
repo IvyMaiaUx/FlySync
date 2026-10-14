@@ -88,10 +88,10 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ onOpenUpgrade, onOpenOff
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <button
             onClick={handleRunManualMatcher}
-            className="px-3.5 py-2 text-xs font-semibold text-slate-200 bg-[#160833] border border-purple-800/60 hover:bg-purple-900/40 hover:text-white rounded-lg transition-colors flex items-center gap-1.5"
+            className="flex-1 sm:flex-initial px-3.5 py-2 text-xs font-semibold text-slate-200 bg-[#160833] border border-purple-800/60 hover:bg-purple-900/40 hover:text-white rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             title="Executa a verificação das buscas salvas contra as ofertas do radar"
           >
             <Play className="w-3.5 h-3.5 text-[#22C55E] fill-[#22C55E]" />
@@ -99,10 +99,10 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ onOpenUpgrade, onOpenOff
           </button>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 text-xs font-bold text-slate-950 bg-[#22C55E] hover:bg-emerald-400 rounded-lg shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all flex items-center gap-1.5"
+            className="flex-1 sm:flex-initial px-4 py-2 text-xs font-bold text-slate-950 bg-[#22C55E] hover:bg-emerald-400 rounded-lg shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
-            <span>Nova Rota Monitorada</span>
+            <span>Nova Rota</span>
           </button>
         </div>
       </div>
