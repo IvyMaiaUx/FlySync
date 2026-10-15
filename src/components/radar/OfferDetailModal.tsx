@@ -232,8 +232,9 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                     {prog?.unitLabel || 'pts'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 mt-0.5">
-                  + Taxas de embarque: <strong className="text-white">R$ {current.cashAmount.toFixed(2)}</strong>
+                <p className="text-xs text-slate-300 mt-0.5 flex items-center gap-1 lg:justify-end">
+                  <span className="text-[#38BDF8] font-bold">+</span>
+                  <span>R$ {current.cashAmount.toFixed(2)} taxas o trecho</span>
                 </p>
               </div>
 

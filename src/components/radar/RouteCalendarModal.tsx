@@ -353,8 +353,9 @@ export const RouteCalendarModal: React.FC<RouteCalendarModalProps> = ({
                             {prog?.unitLabel || 'pts'}
                           </span>
                         </div>
-                        <div className="text-[11px] text-slate-400">
-                          + R$ {offer.cashAmount.toFixed(2)} taxas de embarque
+                        <div className="text-[11px] text-slate-300 font-medium mt-0.5 flex items-center gap-1">
+                          <span className="text-[#38BDF8] font-bold">+</span>
+                          <span>R$ {offer.cashAmount.toFixed(2)} taxas o trecho</span>
                         </div>
                       </div>
 

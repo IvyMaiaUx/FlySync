@@ -726,8 +726,12 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
                         <div className="text-2xl font-black text-white font-mono tabular-nums tracking-tight">
                           {group.lowestMiles.toLocaleString('pt-BR')}
                           <span className="text-xs font-sans text-[#22C55E] ml-1 uppercase">
-                            {prog?.unitLabel || 'pts'}
+                            {prog?.unitLabel || 'milhas'}
                           </span>
+                        </div>
+                        <div className="text-[11px] text-slate-300 font-medium mt-0.5 flex items-center gap-1">
+                          <span className="text-[#38BDF8] font-bold">+</span>
+                          <span>R$ {(group.offers[0]?.cashAmount || 0).toFixed(2)} taxas o trecho</span>
                         </div>
                       </div>
 
@@ -1012,8 +1016,9 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
                             {prog?.unitLabel || 'pts'}
                           </span>
                         </div>
-                        <div className="text-[10px] text-slate-400">
-                          + R$ {offer.cashAmount.toFixed(2)} taxas
+                        <div className="text-[11px] text-slate-300 font-medium mt-0.5 flex items-center gap-1">
+                          <span className="text-[#38BDF8] font-bold">+</span>
+                          <span>R$ {offer.cashAmount.toFixed(2)} taxas o trecho</span>
                         </div>
                         {(() => {
                           const econo = analyzeOfferEconomilha(offer.programId, offer.cabinClass, offer.miles, offer.cashAmount, offer.origin, offer.destination);
