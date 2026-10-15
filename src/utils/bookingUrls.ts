@@ -190,6 +190,10 @@ export const buildGoogleFlightsUrl = (params: BookingUrlParams): string => {
  * Retorna a melhor URL de emissão oficial para uma oferta.
  */
 export const getEffectiveBookingUrl = (offer: FlightOffer): string => {
+  if (offer.bookingUrl && offer.bookingUrl.startsWith('http') && !offer.bookingUrl.includes('google.com/travel')) {
+    return offer.bookingUrl;
+  }
+
   return buildOfficialBookingUrl({
     origin: offer.origin,
     destination: offer.destination,
