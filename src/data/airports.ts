@@ -82,25 +82,72 @@ export const AIRPORTS: AirportItem[] = [
   { iata: 'NRT', city: 'Tóquio', name: 'Narita International Airport', country: 'Japão' }
 ];
 
+import globalIataData from './iata_global.json';
+
+const GLOBAL_AIRPORTS_DICT = globalIataData as Record<string, [string, string]>;
+
 /**
- * Procura um aeroporto pelo código IATA
+ * Procura um aeroporto pelo código IATA (busca na lista curada e no catálogo global de 8.600+ IATAs)
  */
 export const findAirportByIata = (iata: string): AirportItem | undefined => {
   const code = (iata || '').toUpperCase().trim();
-  return AIRPORTS.find(a => a.iata === code);
+  if (!code) return undefined;
+
+  const curated = AIRPORTS.find(a => a.iata === code);
+  if (curated) return curated;
+
+  const globalEntry = GLOBAL_AIRPORTS_DICT[code];
+  if (globalEntry) {
+    return {
+      iata: code,
+      city: globalEntry[0] || code,
+      name: globalEntry[1] || `Aeroporto ${code}`,
+      country: 'Internacional',
+      popular: false
+    };
+  }
+
+  return undefined;
 };
 
 /**
- * Filtra aeroportos por query (IATA, Cidade ou País)
+ * Filtra aeroportos por query (IATA, Cidade ou País) com suporte global a 8.600+ aeroportos
  */
 export const filterAirports = (query: string): AirportItem[] => {
   const q = (query || '').toLowerCase().trim();
   if (!q) return AIRPORTS.filter(a => a.popular);
 
-  return AIRPORTS.filter(a =>
+  const curatedMatches = AIRPORTS.filter(a =>
     a.iata.toLowerCase().includes(q) ||
     a.city.toLowerCase().includes(q) ||
     a.name.toLowerCase().includes(q) ||
     a.country.toLowerCase().includes(q)
   );
+
+  const seenIatas = new Set(curatedMatches.map(a => a.iata));
+  const globalMatches: AirportItem[] = [];
+
+  for (const [code, [city, name]] of Object.entries(GLOBAL_AIRPORTS_DICT)) {
+    if (seenIatas.has(code)) continue;
+
+    const codeMatch = code.toLowerCase().startsWith(q) || code.toLowerCase().includes(q);
+    const cityMatch = city && city.toLowerCase().includes(q);
+    const nameMatch = name && name.toLowerCase().includes(q);
+
+    if (codeMatch || cityMatch || nameMatch) {
+      globalMatches.push({
+        iata: code,
+        city: city || code,
+        name: name || `Aeroporto ${code}`,
+        country: 'Internacional',
+        popular: false
+      });
+
+      if (curatedMatches.length + globalMatches.length >= 30) {
+        break;
+      }
+    }
+  }
+
+  return [...curatedMatches, ...globalMatches];
 };

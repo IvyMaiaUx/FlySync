@@ -13,6 +13,7 @@ import {
   AuditLog
 } from '../types';
 import { buildOfficialBookingUrl } from '../utils/bookingUrls';
+import { findAirportByIata } from '../data/airports';
 
 type Row = Record<string, any>;
 
@@ -101,22 +102,12 @@ const inferAirline = (airline?: string, programId?: string): string => {
   }
 };
 
-const IATA_CITY_MAP: Record<string, string> = {
-  GRU: 'São Paulo', CGH: 'São Paulo', VCP: 'Campinas',
-  GIG: 'Rio de Janeiro', SDU: 'Rio de Janeiro',
-  REC: 'Recife', SSA: 'Salvador', FOR: 'Fortaleza',
-  BSB: 'Brasília', CNF: 'Belo Horizonte', CWB: 'Curitiba',
-  POA: 'Porto Alegre', FLN: 'Florianópolis', MCZ: 'Maceió',
-  NAT: 'Natal', MAO: 'Manaus', BEL: 'Belém',
-  MIA: 'Miami', MCO: 'Orlando', JFK: 'Nova York', EWR: 'Nova York',
-  MAD: 'Madri', LIS: 'Lisboa', OPO: 'Porto',
-  EZE: 'Buenos Aires', AEP: 'Buenos Aires', SCL: 'Santiago',
-  MVD: 'Montevidéu', CDG: 'Paris', LHR: 'Londres'
-};
-
 const inferCity = (city?: string, iata?: string): string => {
   if (city && city.trim() !== '') return city.trim();
-  if (iata && IATA_CITY_MAP[iata.toUpperCase()]) return IATA_CITY_MAP[iata.toUpperCase()];
+  if (iata) {
+    const found = findAirportByIata(iata);
+    if (found?.city) return found.city;
+  }
   return iata || '';
 };
 
