@@ -84,7 +84,7 @@ export const AIRPORTS: AirportItem[] = [
 
 import globalIataData from './iata_global.json';
 
-const GLOBAL_AIRPORTS_DICT = globalIataData as Record<string, [string, string]>;
+export const GLOBAL_AIRPORTS_DICT = globalIataData as Record<string, [string, string]>;
 
 /**
  * Procura um aeroporto pelo código IATA (busca na lista curada e no catálogo global de 8.600+ IATAs)

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { AIRPORTS, AirportItem } from '../../data/airports';
+import { AIRPORTS, AirportItem, findAirportByIata, GLOBAL_AIRPORTS_DICT } from '../../data/airports';
 import { Search, X, PlaneTakeoff, PlaneLanding, MapPin, Check, Sparkles } from 'lucide-react';
 import { FlightOffer } from '../../types';
 
@@ -58,17 +58,58 @@ export const AirportSelect: React.FC<AirportSelectProps> = ({
     return map;
   }, [offers, isOrigin]);
 
-  // Filtra lista de aeroportos combinando catálogo estático e busca do usuário
+  // Filtra lista de aeroportos combinando catálogo estático, catálogo global e busca do usuário
   const filteredAirports = useMemo(() => {
     const q = (searchTerm || '').trim().toLowerCase();
 
-    // Cria lista base de aeroportos
-    const list = [...AIRPORTS];
+    // 1. Se o campo estiver vazio, exibe TODOS os aeroportos com voos no Radar + aeroportos principais
+    if (!q) {
+      const activeList: AirportItem[] = [];
+      const seen = new Set<string>();
 
-    // Se houver IATA nas ofertas que não está no catálogo base, inclui dinamicamente
+      // Aeroportos com ofertas ativas no radar ordenados pelos que têm mais voos
+      const sortedActive = Array.from(availableRoutesMap.entries())
+        .sort((a, b) => b[1] - a[1]);
+
+      for (const [iata] of sortedActive) {
+        if (!seen.has(iata)) {
+          seen.add(iata);
+          const meta = findAirportByIata(iata);
+          if (meta) {
+            activeList.push(meta);
+          } else {
+            activeList.push({
+              iata,
+              city: iata,
+              name: `Aeroporto de ${iata}`,
+              country: 'Destino no Radar',
+              popular: true
+            });
+          }
+        }
+      }
+
+      // Adiciona todos os aeroportos curados do Brasil e do mundo que ainda não entraram
+      for (const a of AIRPORTS) {
+        if (!seen.has(a.iata)) {
+          seen.add(a.iata);
+          activeList.push(a);
+        }
+      }
+
+      return activeList;
+    }
+
+    // 2. Se o usuário estiver pesquisando: busca em curados + ofertas + catálogo de 8.600+ IATAs
+    const matches: AirportItem[] = [];
+    const seen = new Set<string>();
+
+    // Primeiro no catálogo base e ativos
+    const baseAndActive = [...AIRPORTS];
     availableRoutesMap.forEach((_, iata) => {
-      if (!list.some(a => a.iata === iata)) {
-        list.push({
+      if (!baseAndActive.some(a => a.iata === iata)) {
+        const meta = findAirportByIata(iata);
+        baseAndActive.push(meta || {
           iata,
           city: iata,
           name: `Aeroporto de ${iata}`,
@@ -78,34 +119,54 @@ export const AirportSelect: React.FC<AirportSelectProps> = ({
       }
     });
 
-    if (!q) {
-      // Prioriza aeroportos que têm ofertas ativas no Radar ou populares
-      return list
-        .filter(a => a.popular || availableRoutesMap.has(a.iata))
-        .sort((a, b) => {
-          const countA = availableRoutesMap.get(a.iata) || 0;
-          const countB = availableRoutesMap.get(b.iata) || 0;
-          return countB - countA;
-        })
-        .slice(0, 10);
-    }
-
-    return list
-      .filter(a =>
+    for (const a of baseAndActive) {
+      if (
         a.iata.toLowerCase().includes(q) ||
         a.city.toLowerCase().includes(q) ||
         a.name.toLowerCase().includes(q) ||
         a.country.toLowerCase().includes(q)
-      )
-      .sort((a, b) => {
-        // Exatidão de IATA primeiro
-        if (a.iata.toLowerCase() === q) return -1;
-        if (b.iata.toLowerCase() === q) return 1;
-        if (a.iata.toLowerCase().startsWith(q)) return -1;
-        if (b.iata.toLowerCase().startsWith(q)) return 1;
-        return 0;
-      })
-      .slice(0, 15);
+      ) {
+        if (!seen.has(a.iata)) {
+          seen.add(a.iata);
+          matches.push(a);
+        }
+      }
+    }
+
+    // Busca no catálogo global completo de 8.600+ aeroportos
+    for (const [code, [city, name]] of Object.entries(GLOBAL_AIRPORTS_DICT)) {
+      if (seen.has(code)) continue;
+
+      const codeMatch = code.toLowerCase().startsWith(q) || code.toLowerCase().includes(q);
+      const cityMatch = city && city.toLowerCase().includes(q);
+      const nameMatch = name && name.toLowerCase().includes(q);
+
+      if (codeMatch || cityMatch || nameMatch) {
+        seen.add(code);
+        matches.push({
+          iata: code,
+          city: city || code,
+          name: name || `Aeroporto ${code}`,
+          country: 'Internacional',
+          popular: false
+        });
+        if (matches.length >= 60) break;
+      }
+    }
+
+    return matches.sort((a, b) => {
+      // Exatidão de IATA primeiro
+      if (a.iata.toLowerCase() === q) return -1;
+      if (b.iata.toLowerCase() === q) return 1;
+      // Ofertas ativas primeiro
+      const countA = availableRoutesMap.get(a.iata) || 0;
+      const countB = availableRoutesMap.get(b.iata) || 0;
+      if (countA !== countB) return countB - countA;
+      // Começo do código IATA
+      if (a.iata.toLowerCase().startsWith(q) && !b.iata.toLowerCase().startsWith(q)) return -1;
+      if (!a.iata.toLowerCase().startsWith(q) && b.iata.toLowerCase().startsWith(q)) return 1;
+      return 0;
+    });
   }, [searchTerm, availableRoutesMap]);
 
   const handleSelect = (airport: AirportItem) => {
