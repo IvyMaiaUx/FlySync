@@ -1,8 +1,9 @@
 import { FlightOffer } from '../types';
 
 /**
- * Utilitário para gerar URLs diretas de emissão e busca com milhas pré-preenchidas
- * com Origem, Destino, Data de Partida, Cabine e Passageiros.
+ * Utilitário para gerar URLs oficiais de emissão de passagens por programa de fidelidade.
+ * Mapeamento baseado rigorosamente na matriz oficial fornecida pelo usuário:
+ * Programas de Viagem | Companhias Aéreas Nacionais & Internacionais | Links de Emissão
  */
 
 export interface BookingUrlParams {
@@ -16,90 +17,150 @@ export interface BookingUrlParams {
   airline?: string;
 }
 
-/**
- * Normaliza e identifica o programa ou cia aérea
- */
-const detectProgram = (programId?: string, airline?: string): 'smiles' | 'latam' | 'azul' | 'tap' | 'iberia' | 'other' => {
-  const p = (programId || '').toLowerCase();
-  const a = (airline || '').toLowerCase();
+export interface ProgramMappingRule {
+  programKeywords: string[];
+  url: string;
+}
 
-  if (p.includes('smiles') || a.includes('gol') || a.includes('smiles')) return 'smiles';
-  if (p.includes('latam') || a.includes('latam')) return 'latam';
-  if (p.includes('azul') || a.includes('azul')) return 'azul';
-  if (p.includes('tap') || a.includes('tap')) return 'tap';
-  if (p.includes('iberia') || a.includes('iberia')) return 'iberia';
+export const PROGRAM_EMISSION_RULES: ProgramMappingRule[] = [
+  // 1. AAdvantage
+  // GOL, American Airlines, British Airways, Cathay Pacific, Etihad Airways, Fiji Airways, Finnair, Iberia, Japan Airlines, Qantas Airways, Qatar Airways, Royal Air Maroc
+  {
+    programKeywords: ['aadvantage', 'aa.com', 'american'],
+    url: 'https://www.aa.com/'
+  },
 
-  return 'other';
-};
+  // 2. Aeroplan
+  // Azul, GOL, Air Canada, All Nippon Airways, Avianca, Lufthansa, TAP Air Portugal
+  {
+    programKeywords: ['aeroplan', 'air canada'],
+    url: 'https://www.aeroplan.com/'
+  },
 
-export const isBookingLinkSupported = (paramsOrOffer?: { airline?: string; programId?: string } | null): boolean => {
-  if (!paramsOrOffer) return true;
-  const p = (paramsOrOffer.programId || '').toLowerCase();
-  const a = (paramsOrOffer.airline || '').toLowerCase();
-  if (p.includes('latam') || a.includes('latam')) {
-    return false;
+  // 3. Azul Pelo Mundo (interline internacional da Azul)
+  // Aerolíneas Argentinas, Air Europa, Avianca, Copa Airlines, Emirates, Ethiopian Airlines, Etihad Airways, Qatar Airways, Royal Air Maroc, SKY Airline, TAAG, Turkish Airlines, United Airlines, American Airlines
+  {
+    programKeywords: ['azul pelo mundo', 'azulpelomundo', 'mundo'],
+    url: 'https://azulpelomundo.voeazul.com.br/'
+  },
+
+  // 4. Azul Fidelidade
+  // Azul, Air Canada, Copa Airlines, Turkish Airlines, United Airlines
+  {
+    programKeywords: ['azul fidelidade', 'tudoazul', 'prog-azul', 'azul'],
+    url: 'https://www.voeazul.com.br/'
+  },
+
+  // 5. Executive Club
+  // British Airways
+  {
+    programKeywords: ['executive club', 'executiveclub', 'british airways', 'ba.com'],
+    url: 'https://www.britishairways.com/travel/redeem/execclub/_gf/pt_br'
+  },
+
+  // 6. Finnair Plus
+  // Air France, Finnair
+  {
+    programKeywords: ['finnair'],
+    url: 'https://www.finnair.com/'
+  },
+
+  // 7. Flying Club
+  // LATAM, Air France, Iberia, KLM, Virgin Atlantic
+  {
+    programKeywords: ['flying club', 'flyingclub', 'virgin atlantic', 'virgin'],
+    url: 'https://www.virginatlantic.com/flying-club/'
+  },
+
+  // 8. Flying Blue
+  // Air France, KLM
+  {
+    programKeywords: ['flying blue', 'flyingblue', 'air france', 'klm'],
+    url: 'https://www.flyingblue.com/'
+  },
+
+  // 9. Iberia Plus
+  // LATAM, British Airways, Cathay Pacific, Iberia
+  {
+    programKeywords: ['iberia plus', 'iberiaplus', 'prog-iberia', 'iberia'],
+    url: 'https://www.iberia.com/us/'
+  },
+
+  // 10. KrisFlyer
+  // Singapore Airlines
+  {
+    programKeywords: ['krisflyer', 'singapore airlines', 'singapore'],
+    url: 'https://www.singaporeair.com/'
+  },
+
+  // 11. Latam Pass
+  // LATAM, Iberia, Lufthansa, Delta Air Lines, Japan Airlines, Qatar Airways, Swiss
+  {
+    programKeywords: ['latam pass', 'latampass', 'prog-latampass', 'latam'],
+    url: 'https://latampass.latam.com/pt_br/passagens'
+  },
+
+  // 12. Privilege Club
+  // LATAM, American Airlines, British Airways, Iberia, Qatar Airways, Royal Air Maroc
+  {
+    programKeywords: ['privilege club', 'privilegeclub', 'qatar airways', 'qatar'],
+    url: 'https://www.qatarairways.com/en/homepage.html'
+  },
+
+  // 13. Smiles
+  // GOL, Azul, Aerolíneas Argentinas, Aeroméxico, Air Canada, Air Europa, Air France, American Airlines, Avianca, Copa Airlines, Emirates, Ethiopian Airlines, KLM, Korean Air, Royal Air Maroc, South African Airways, TAP Air Portugal, Turkish Airlines
+  {
+    programKeywords: ['smiles', 'prog-smiles'],
+    url: 'https://www.smiles.com.br/passagens'
+  },
+
+  // 14. TAP Miles&Go
+  // TAP Air Portugal
+  {
+    programKeywords: ['tap miles&go', 'tap miles and go', 'miles&go', 'prog-tap', 'tap air portugal', 'tap'],
+    url: 'https://www.flytap.com/'
   }
+];
+
+export const isBookingLinkSupported = (_paramsOrOffer?: { airline?: string; programId?: string } | null): boolean => {
   return true;
 };
 
 /**
- * Gera URL oficial de resgate de milhas pré-preenchida para a data e rota selecionadas.
+ * Gera URL oficial de resgate de passagens baseada no programa de fidelidade emissor
  */
 export const buildOfficialBookingUrl = (params: BookingUrlParams): string => {
-  const origin = (params.origin || 'GRU').toUpperCase().trim();
-  const destination = (params.destination || 'REC').toUpperCase().trim();
-  const date = params.departureDate || new Date().toISOString().split('T')[0];
-  const isRoundTrip = params.tripType === 'round_trip' && !!params.returnDate;
-  const returnDate = params.returnDate;
-  const cabin = params.cabinClass || 'economy';
-  const programType = detectProgram(params.programId, params.airline);
+  const p = (params.programId || '').toLowerCase().replace(/[-_]/g, ' ').trim();
+  const a = (params.airline || '').toLowerCase().trim();
 
-  switch (programType) {
-    case 'smiles': {
-      // Smiles: emissão com milhas direta
-      const baseUrl = 'https://www.smiles.com.br/emissao-com-milhas';
-      const query = new URLSearchParams({
-        originAirportCode: origin,
-        destinationAirportCode: destination,
-        departureDate: date,
-        adults: '1',
-        children: '0',
-        infants: '0',
-        tripType: isRoundTrip ? '2' : '1',
-        cabinType: cabin === 'business' ? 'BUSINESS' : 'all',
-        currencyCode: 'BRL'
-      });
-      if (isRoundTrip && returnDate) {
-        query.set('returnDate', returnDate);
+  // 1. Prioridade: busca pelo programa de fidelidade
+  if (p) {
+    for (const rule of PROGRAM_EMISSION_RULES) {
+      if (rule.programKeywords.some(keyword => p.includes(keyword))) {
+        return rule.url;
       }
-      return `${baseUrl}?${query.toString()}`;
-    }
-
-    case 'latam': {
-      // LATAM Pass: busca direta manual pelo usuário no app/site (sem deep link pré-preenchido)
-      return '';
-    }
-
-    case 'azul': {
-      // Azul Fidelidade: portal oficial de passagens e resgate com pontos
-      return 'https://www.voeazul.com.br/br/pt/home';
-    }
-
-    case 'tap': {
-      // TAP Miles&Go: portal oficial de emissão com milhas
-      return 'https://www.flytap.com/pt-br/miles-and-go';
-    }
-
-    case 'iberia': {
-      // Iberia Plus (Avios): portal oficial de busca e resgate com Avios
-      return 'https://www.iberia.com/br/';
-    }
-
-    default: {
-      // Fallback universal: Google Flights com a data e rota exata
-      return buildGoogleFlightsUrl(params);
     }
   }
+
+  // 2. Fallback: caso o programId não esteja explícito, mapeia pela companhia aérea
+  if (a) {
+    if (a.includes('gol')) return 'https://www.smiles.com.br/passagens';
+    if (a.includes('latam')) return 'https://latampass.latam.com/pt_br/passagens';
+    if (a.includes('azul pelo mundo')) return 'https://azulpelomundo.voeazul.com.br/';
+    if (a.includes('azul')) return 'https://www.voeazul.com.br/';
+    if (a.includes('iberia')) return 'https://www.iberia.com/us/';
+    if (a.includes('tap')) return 'https://www.flytap.com/';
+    if (a.includes('british')) return 'https://www.britishairways.com/travel/redeem/execclub/_gf/pt_br';
+    if (a.includes('american')) return 'https://www.aa.com/';
+    if (a.includes('qatar')) return 'https://www.qatarairways.com/en/homepage.html';
+    if (a.includes('air canada')) return 'https://www.aeroplan.com/';
+    if (a.includes('singapore')) return 'https://www.singaporeair.com/';
+    if (a.includes('virgin')) return 'https://www.virginatlantic.com/flying-club/';
+    if (a.includes('finnair')) return 'https://www.finnair.com/';
+    if (a.includes('air france') || a.includes('klm')) return 'https://www.flyingblue.com/';
+  }
+
+  return 'https://www.google.com/travel/flights';
 };
 
 /**
@@ -126,13 +187,9 @@ export const buildGoogleFlightsUrl = (params: BookingUrlParams): string => {
 };
 
 /**
- * Retorna a melhor URL de emissão para uma oferta.
- * Sempre garante que a data selecionada na tela está contida no link.
+ * Retorna a melhor URL de emissão oficial para uma oferta.
  */
 export const getEffectiveBookingUrl = (offer: FlightOffer): string => {
-  if (!isBookingLinkSupported(offer)) {
-    return '';
-  }
   return buildOfficialBookingUrl({
     origin: offer.origin,
     destination: offer.destination,

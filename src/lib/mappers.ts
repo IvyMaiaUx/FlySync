@@ -133,20 +133,16 @@ export const toOffer = (r: Row): FlightOffer => ({
   availabilityStatus: r.availability_status,
   observedAt: r.observed_at,
   verifiedAt: r.verified_at,
-  bookingUrl: !isBookingLinkSupported({ airline: r.airline, programId: r.program_id })
-    ? undefined
-    : (r.booking_url && !r.booking_url.includes('/voos/') && !r.booking_url.includes('/reserva-de-voos') && r.departure_date && r.booking_url.includes(r.departure_date))
-      ? r.booking_url
-      : (buildOfficialBookingUrl({
-          origin: r.origin,
-          destination: r.destination,
-          departureDate: r.departure_date,
-          returnDate: r.return_date,
-          tripType: r.trip_type,
-          cabinClass: r.cabin_class,
-          programId: r.program_id,
-          airline: r.airline
-        }) || undefined),
+  bookingUrl: buildOfficialBookingUrl({
+    origin: r.origin,
+    destination: r.destination,
+    departureDate: r.departure_date,
+    returnDate: r.return_date,
+    tripType: r.trip_type,
+    cabinClass: r.cabin_class,
+    programId: r.program_id,
+    airline: r.airline
+  }),
   sourceName: r.source_name,
   seatsLeft: r.seats_left === null || r.seats_left === undefined ? undefined : num(r.seats_left)
 });

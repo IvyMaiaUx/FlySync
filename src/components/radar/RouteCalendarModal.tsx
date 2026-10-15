@@ -377,19 +377,13 @@ export const RouteCalendarModal: React.FC<RouteCalendarModalProps> = ({
                       <span>Criar Alerta</span>
                     </button>
 
-                    {isBookingLinkSupported(offer) ? (
-                      <button
-                        onClick={() => handleBookingClick(offer)}
-                        className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-950 bg-[#22C55E] hover:bg-emerald-400 transition-colors flex items-center gap-1.5 shadow-[0_0_10px_rgba(34,197,94,0.3)]"
-                      >
-                        <span>Emitir no Site Oficial</span>
-                        <ExternalLink className="w-3.5 h-3.5 stroke-[2.5]" />
-                      </button>
-                    ) : (
-                      <span className="text-[11px] font-semibold text-slate-400 bg-purple-950/50 border border-purple-900/60 px-2.5 py-1 rounded-lg">
-                        Buscar no app LATAM
-                      </span>
-                    )}
+                    <button
+                      onClick={() => handleBookingClick(offer)}
+                      className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-950 bg-[#22C55E] hover:bg-emerald-400 transition-colors flex items-center gap-1.5 shadow-[0_0_10px_rgba(34,197,94,0.3)]"
+                    >
+                      <span>Emitir no Site Oficial</span>
+                      <ExternalLink className="w-3.5 h-3.5 stroke-[2.5]" />
+                    </button>
                   </div>
                 </div>
               );
