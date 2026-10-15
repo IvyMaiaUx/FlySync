@@ -80,8 +80,43 @@ export const toBalanceHistory = (r: Row): BalanceHistory => ({
   note: opt(r.note)
 });
 
+const AIRLINE_CODE_MAP: Record<string, string> = {
+  'JJ': 'LATAM Airlines',
+  'LA': 'LATAM Airlines',
+  'G3': 'GOL Linhas Aéreas',
+  'AD': 'Azul Linhas Aéreas',
+  'TP': 'TAP Air Portugal',
+  'IB': 'Iberia',
+  'AF': 'Air France',
+  'KL': 'KLM',
+  'AA': 'American Airlines',
+  'DL': 'Delta Air Lines',
+  'UA': 'United Airlines',
+  'CM': 'Copa Airlines',
+  'AV': 'Avianca',
+  'AR': 'Aerolíneas Argentinas',
+  '2Z': 'Voepass Linhas Aéreas',
+  'WJ': 'JetSMART',
+  'JA': 'JetSMART',
+  'H2': 'SKY Airline',
+  'FO': 'Flybondi',
+  'QR': 'Qatar Airways',
+  'EK': 'Emirates',
+  'TK': 'Turkish Airlines',
+  'BA': 'British Airways',
+  'AZ': 'ITA Airways',
+  'LH': 'Lufthansa',
+  'LX': 'SWISS',
+  'UX': 'Air Europa',
+};
+
 const inferAirline = (airline?: string, programId?: string): string => {
-  if (airline && airline.trim() !== '') return airline.trim();
+  if (airline && airline.trim() !== '') {
+    const trimmed = airline.trim();
+    const code = trimmed.toUpperCase();
+    if (AIRLINE_CODE_MAP[code]) return AIRLINE_CODE_MAP[code];
+    return trimmed;
+  }
   switch (programId) {
     case 'prog-latampass':
       return 'LATAM Airlines';
