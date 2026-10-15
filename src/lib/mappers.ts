@@ -115,27 +115,38 @@ export const toOffer = (r: Row): FlightOffer => {
   let miles = num(r.miles);
   let cashAmount = num(r.cash_amount);
   const airline = inferAirline(r.airline, r.program_id);
+  const rawId = String(r.raw_id || r.id || '');
+  const isFromCashScraper = rawId.startsWith('md_') || 
+                            String(r.source_name || '').includes('Melhores') || 
+                            String(r.booking_url || '').includes('melhoresdestinos') ||
+                            r.payment_type === 'cash' ||
+                            (miles > 0 && miles < 3000);
 
-  // SANITIZAÇÃO: Se a oferta veio de scraper de passagens em dinheiro (ex: R$ 309 salvo no campo de milhas)
-  // Converte a tarifa líquida para milhas de mercado pelo CPM da companhia e aplica taxa de embarque ANAC
-  if (miles > 0 && miles < 3000) {
-    const priceCash = miles;
+  let paymentType: 'miles' | 'cash' = isFromCashScraper ? 'cash' : (r.payment_type || 'miles');
+  let cashPriceTotal = r.cash_price_total ? num(r.cash_price_total) : undefined;
+
+  // Se a oferta é promocional em dinheiro (ex: R$ 309 do Melhores Destinos)
+  if (isFromCashScraper) {
+    paymentType = 'cash';
+    const rawCash = (cashPriceTotal && cashPriceTotal > 0) ? cashPriceTotal : (miles > 0 && miles < 3000 ? miles : 309);
+    cashPriceTotal = rawCash;
+
     const isIntl = ['MIA', 'MCO', 'JFK', 'MAD', 'LIS', 'CDG', 'EZE', 'SCL', 'MVD', 'BOG', 'LIM'].includes(r.origin) ||
                    ['MIA', 'MCO', 'JFK', 'MAD', 'LIS', 'CDG', 'EZE', 'SCL', 'MVD', 'BOG', 'LIM'].includes(r.destination);
     const cpm = airline.includes('LATAM') ? 0.021 : airline.includes('Azul') ? 0.019 : 0.0175;
     if (isIntl) {
       cashAmount = 382.40;
-      miles = Math.round((Math.max(300, priceCash - cashAmount) / 0.022) / 100) * 100;
+      miles = Math.round((Math.max(300, rawCash - cashAmount) / 0.022) / 100) * 100;
     } else {
       cashAmount = 54.90;
-      miles = Math.round((Math.max(100, priceCash - cashAmount) / cpm) / 100) * 100;
+      miles = Math.round((Math.max(100, rawCash - cashAmount) / cpm) / 100) * 100;
     }
   }
 
   return {
     id: r.id,
     sourceId: r.source_id || '',
-    programId: r.program_id,
+    programId: isFromCashScraper ? 'prog-cash' : r.program_id,
     origin: r.origin,
     originCity: inferCity(r.origin_city, r.origin),
     destination: r.destination,
@@ -164,8 +175,10 @@ export const toOffer = (r: Row): FlightOffer => {
       programId: r.program_id,
       airline: r.airline
     }),
-    sourceName: r.source_name || 'Scraper Monitor-Milhas',
-    seatsLeft: opt(r.seats_left)
+    sourceName: isFromCashScraper ? 'Melhores Destinos (Dinheiro)' : (r.source_name || 'Scraper Monitor-Milhas'),
+    seatsLeft: opt(r.seats_left),
+    paymentType,
+    cashPriceTotal
   };
 };
 

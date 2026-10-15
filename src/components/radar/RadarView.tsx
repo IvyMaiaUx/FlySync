@@ -25,7 +25,8 @@ import {
   Bell,
   BellRing,
   Flame,
-  Users
+  Users,
+  DollarSign
 } from 'lucide-react';
 
 interface RadarViewProps {
@@ -63,6 +64,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
   const [tripType, setTripType] = useState<string>('all');
   const [maxMiles, setMaxMiles] = useState<number>(300000);
   const [selectedMonth, setSelectedMonth] = useState<string>('all'); // e.g. 'all' or '2026-11'
+  const [paymentMode, setPaymentMode] = useState<'all' | 'miles' | 'cash'>('all');
   const [sortBy, setSortBy] = useState<'miles_asc' | 'date_desc' | 'verified_desc' | 'cash_asc'>('miles_asc');
 
   // View Mode: 'cards' (individual offers) or 'routes' (grouped multi-month routes)
@@ -123,6 +125,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
     setSelectedProgram('all');
     setCabinClass('all');
     setTripType('all');
+    setPaymentMode('all');
     setMaxMiles(300000);
     setSelectedMonth('all');
     setSortBy('miles_asc');
@@ -171,6 +174,14 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
         return false;
       }
 
+      // Payment mode filter (Milhas vs Dinheiro)
+      if (paymentMode === 'miles' && offer.paymentType === 'cash') {
+        return false;
+      }
+      if (paymentMode === 'cash' && offer.paymentType !== 'cash') {
+        return false;
+      }
+
       // Max miles filter (300k+ = ilimitado, mostra tudo)
       if (maxMiles < 300000 && offer.miles > maxMiles) {
         return false;
@@ -188,7 +199,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
       }
       return 0;
     });
-  }, [offers, originSearch, destSearch, selectedProgram, cabinClass, tripType, selectedMonth, maxMiles, sortBy]);
+  }, [offers, originSearch, destSearch, selectedProgram, cabinClass, tripType, selectedMonth, paymentMode, maxMiles, sortBy]);
 
   // Grouped Routes calculation for Multi-Month View
   const groupedRoutes = useMemo(() => {
@@ -202,6 +213,8 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
       cabinClass: string;
       programId: string;
       lowestMiles: number;
+      lowestCashPrice?: number;
+      hasCashOffer: boolean;
       offers: FlightOffer[];
       months: Map<string, { label: string; count: number; minMiles: number }>;
     }>();
@@ -219,6 +232,8 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
           cabinClass: o.cabinClass,
           programId: o.programId,
           lowestMiles: o.miles,
+          lowestCashPrice: o.cashPriceTotal,
+          hasCashOffer: o.paymentType === 'cash',
           offers: [],
           months: new Map()
         });
@@ -228,6 +243,13 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
       group.offers.push(o);
       if (o.miles < group.lowestMiles) {
         group.lowestMiles = o.miles;
+      }
+      if (o.paymentType === 'cash') {
+        group.hasCashOffer = true;
+        const cPrice = o.cashPriceTotal || o.miles;
+        if (!group.lowestCashPrice || cPrice < group.lowestCashPrice) {
+          group.lowestCashPrice = cPrice;
+        }
       }
 
       // Track months
@@ -251,8 +273,13 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
         key: mKey,
         ...data
       })).sort((a, b) => a.key.localeCompare(b.key))
-    })).sort((a, b) => a.lowestMiles - b.lowestMiles);
-  }, [filteredOffers]);
+    })).sort((a, b) => {
+      if (paymentMode === 'cash') {
+        return (a.lowestCashPrice || Infinity) - (b.lowestCashPrice || Infinity);
+      }
+      return a.lowestMiles - b.lowestMiles;
+    });
+  }, [filteredOffers, paymentMode]);
 
   // Count available offers for a specific route
   const getRouteOfferCount = (origin: string, dest: string) => {
@@ -363,46 +390,90 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
 
       {/* Filter Toolbar */}
       <div className="p-4 sm:p-5 rounded-2xl bg-[#13062C] border border-purple-900/60 shadow-xl space-y-4">
-        {/* Seletor Rápido: Só Ida vs Ida e Volta vs Todas */}
-        <div className="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-purple-900/40">
-          <div className="flex items-center gap-1.5 bg-[#0F0324] p-1 rounded-xl border border-purple-900/60">
-            <button
-              type="button"
-              onClick={() => setTripType('all')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                tripType === 'all'
-                  ? 'bg-purple-900/90 text-white border border-[#22C55E]/60 shadow-sm'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <span>Todas as Viagens</span>
-            </button>
+        {/* Seletor Rápido: Modalidade (Milhas vs Dinheiro) e Tipo de Viagem */}
+        <div className="flex items-center justify-between flex-wrap gap-2.5 pb-2 border-b border-purple-900/40">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Modalidade de Pagamento / Oferta */}
+            <div className="flex items-center gap-1 bg-[#0B0218] p-1 rounded-xl border border-purple-900/70">
+              <button
+                type="button"
+                onClick={() => setPaymentMode('all')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  paymentMode === 'all'
+                    ? 'bg-purple-900/90 text-white border border-[#22C55E]/60 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>Todas as Ofertas</span>
+              </button>
 
-            <button
-              type="button"
-              onClick={() => setTripType('one_way')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                tripType === 'one_way'
-                  ? 'bg-[#22C55E] text-slate-950 font-black shadow-[0_0_12px_rgba(34,197,94,0.35)]'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>Só Ida</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => setPaymentMode('miles')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  paymentMode === 'miles'
+                    ? 'bg-[#22C55E] text-slate-950 font-black shadow-[0_0_12px_rgba(34,197,94,0.35)]'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Plane className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>Em Milhas</span>
+              </button>
 
-            <button
-              type="button"
-              onClick={() => setTripType('round_trip')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                tripType === 'round_trip'
-                  ? 'bg-[#22C55E] text-slate-950 font-black shadow-[0_0_12px_rgba(34,197,94,0.35)]'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <ArrowLeftRight className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>Ida e Volta</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => setPaymentMode('cash')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  paymentMode === 'cash'
+                    ? 'bg-emerald-400 text-slate-950 font-black shadow-[0_0_12px_rgba(16,185,129,0.35)]'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <DollarSign className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>Em Dinheiro (R$)</span>
+              </button>
+            </div>
+
+            {/* Trip Type */}
+            <div className="flex items-center gap-1 bg-[#0F0324] p-1 rounded-xl border border-purple-900/60">
+              <button
+                type="button"
+                onClick={() => setTripType('all')}
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  tripType === 'all'
+                    ? 'bg-purple-800/80 text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>Todas</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTripType('one_way')}
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                  tripType === 'one_way'
+                    ? 'bg-purple-600 text-white font-bold'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <ArrowRight className="w-3 h-3" />
+                <span>Só Ida</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTripType('round_trip')}
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                  tripType === 'round_trip'
+                    ? 'bg-purple-600 text-white font-bold'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <ArrowLeftRight className="w-3 h-3" />
+                <span>Ida e Volta</span>
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
@@ -608,12 +679,19 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
                       {/* Top Header */}
                       <div className="flex flex-wrap items-center justify-between text-xs gap-2 mb-3">
                         <div className="flex items-center gap-2">
-                          <span
-                            className="w-2.5 h-2.5 rounded-full shrink-0"
-                            style={{ backgroundColor: prog?.color || '#38BDF8' }}
-                          />
+                          {group.offers[0]?.paymentType === 'cash' ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-[#22C55E] border border-emerald-500/40 flex items-center gap-1 shadow-xs">
+                              <DollarSign className="w-3 h-3 stroke-[3]" />
+                              <span>Tarifa em Dinheiro (R$)</span>
+                            </span>
+                          ) : (
+                            <span
+                              className="w-2.5 h-2.5 rounded-full shrink-0"
+                              style={{ backgroundColor: prog?.color || '#38BDF8' }}
+                            />
+                          )}
                           <span className="font-bold text-white">
-                            {group.airline} · {prog?.name}
+                            {group.airline} {group.offers[0]?.paymentType !== 'cash' && `· ${prog?.name}`}
                           </span>
                         </div>
 
@@ -746,17 +824,38 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
                     {/* Footer Row with Lowest Price & Action */}
                     <div className="mt-4 pt-3 border-t border-purple-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-baseline justify-between sm:block">
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block">A partir de</span>
-                        <div className="text-2xl font-black text-white font-mono tabular-nums tracking-tight">
-                          {group.lowestMiles.toLocaleString('pt-BR')}
-                          <span className="text-xs font-sans text-[#22C55E] ml-1 uppercase">
-                            {prog?.unitLabel || 'milhas'}
-                          </span>
-                        </div>
-                        <div className="text-[11px] text-slate-300 font-medium mt-0.5 flex items-center gap-1">
-                          <span className="text-[#38BDF8] font-bold">+</span>
-                          <span>R$ {(group.offers[0]?.cashAmount || 0).toFixed(2)} taxas o trecho</span>
-                        </div>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                          {group.offers[0]?.paymentType === 'cash' ? 'Tarifa em Dinheiro' : 'A partir de'}
+                        </span>
+
+                        {group.offers[0]?.paymentType === 'cash' ? (
+                          <div>
+                            <div className="text-2xl font-black text-[#22C55E] font-mono tabular-nums tracking-tight flex items-baseline gap-1.5">
+                              <span>R$ {(group.offers[0]?.cashPriceTotal || group.lowestCashPrice || 309).toLocaleString('pt-BR')}</span>
+                              <span className="text-[11px] font-sans text-emerald-300 font-bold uppercase">
+                                total c/ taxas
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-400 font-medium mt-0.5 flex items-center gap-1.5">
+                              <span className="text-purple-300">Equivale a ~{group.lowestMiles.toLocaleString('pt-BR')} milhas</span>
+                              <span className="text-slate-600">·</span>
+                              <span className="text-emerald-400 font-semibold">Tarifa quente</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="text-2xl font-black text-white font-mono tabular-nums tracking-tight">
+                              {group.lowestMiles.toLocaleString('pt-BR')}
+                              <span className="text-xs font-sans text-[#22C55E] ml-1 uppercase">
+                                {prog?.unitLabel || 'milhas'}
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-300 font-medium mt-0.5 flex items-center gap-1">
+                              <span className="text-[#38BDF8] font-bold">+</span>
+                              <span>R$ {(group.offers[0]?.cashAmount || 0).toFixed(2)} taxas o trecho</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -1031,19 +1130,40 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
                     {/* Price & CTA Footer */}
                     <div className="mt-3 pt-2.5 border-t border-purple-900/40 flex items-center justify-between gap-2">
                       <div className="min-w-0">
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Tarifa em milhas</span>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-xl font-black text-white font-mono tabular-nums">
-                            {offer.miles.toLocaleString('pt-BR')}
-                          </span>
-                          <span className="text-[10px] text-[#22C55E] uppercase font-bold">
-                            {prog?.unitLabel || 'pts'}
-                          </span>
-                        </div>
-                        <div className="text-[11px] text-slate-300 font-medium mt-0.5 flex items-center gap-1">
-                          <span className="text-[#38BDF8] font-bold">+</span>
-                          <span>R$ {offer.cashAmount.toFixed(2)} taxas o trecho</span>
-                        </div>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                          {offer.paymentType === 'cash' ? 'Tarifa em Dinheiro' : 'Tarifa em milhas'}
+                        </span>
+
+                        {offer.paymentType === 'cash' ? (
+                          <div>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-xl font-black text-[#22C55E] font-mono tabular-nums">
+                                R$ {(offer.cashPriceTotal || 309).toLocaleString('pt-BR')}
+                              </span>
+                              <span className="text-[10px] text-emerald-300 uppercase font-bold">
+                                c/ taxas
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-purple-300 font-medium mt-0.5">
+                              Equivale a ~{offer.miles.toLocaleString('pt-BR')} milhas
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-xl font-black text-white font-mono tabular-nums">
+                                {offer.miles.toLocaleString('pt-BR')}
+                              </span>
+                              <span className="text-[10px] text-[#22C55E] uppercase font-bold">
+                                {prog?.unitLabel || 'pts'}
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-300 font-medium mt-0.5 flex items-center gap-1">
+                              <span className="text-[#38BDF8] font-bold">+</span>
+                              <span>R$ {offer.cashAmount.toFixed(2)} taxas o trecho</span>
+                            </div>
+                          </div>
+                        )}
                         {(() => {
                           const econo = analyzeOfferEconomilha(offer.programId, offer.cabinClass, offer.miles, offer.cashAmount, offer.origin, offer.destination);
                           if (econo.savedPercent <= 0) return null;

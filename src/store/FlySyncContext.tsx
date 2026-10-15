@@ -203,7 +203,12 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ]);
 
       if (progRes.data && progRes.data.length > 0) {
-        setPrograms(progRes.data.map(toProgram));
+        const dbPrograms = progRes.data.map(toProgram);
+        if (!dbPrograms.some(p => p.id === 'prog-cash')) {
+          const cashProg = INITIAL_PROGRAMS.find(p => p.id === 'prog-cash');
+          if (cashProg) dbPrograms.push(cashProg);
+        }
+        setPrograms(dbPrograms);
       }
       if (offRes.data && offRes.data.length > 0) {
         const futureOffers = offRes.data.map(toOffer).filter(o => o.departureDate >= todayStr);

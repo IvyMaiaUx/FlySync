@@ -90,6 +90,8 @@ export interface FlightOffer {
   bookingUrl: string;
   sourceName: string;
   seatsLeft?: number;
+  paymentType?: 'miles' | 'cash';
+  cashPriceTotal?: number; // Preço promocional em dinheiro quando paymentType === 'cash'
 }
 
 export interface OfferObservation {

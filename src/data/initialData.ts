@@ -112,6 +112,17 @@ export const INITIAL_PROGRAMS: LoyaltyProgram[] = [
     color: '#D81E05',
     bgLight: '#FDF1EF',
     airlineAlliance: 'oneworld'
+  },
+  {
+    id: 'prog-cash',
+    code: 'cash',
+    name: 'Tarifa em Dinheiro (R$)',
+    category: 'airline',
+    unitLabel: 'R$',
+    isActive: true,
+    color: '#10B981',
+    bgLight: '#ECFDF5',
+    airlineAlliance: 'Passagens Pagantes / Promoções'
   }
 ];
 

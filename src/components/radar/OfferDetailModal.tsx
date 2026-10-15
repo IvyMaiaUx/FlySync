@@ -25,7 +25,8 @@ import {
   Building2,
   ArrowRight,
   Layers,
-  AlertTriangle
+  AlertTriangle,
+  DollarSign
 } from 'lucide-react';
 
 interface OfferDetailModalProps {
@@ -225,18 +226,41 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
             <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end justify-between gap-3 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-purple-900/60">
               <div className="lg:text-right">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">
-                  Tarifa em Milhas
+                  {current.paymentType === 'cash' ? (
+                    <span className="text-emerald-400 font-bold flex items-center gap-1 lg:justify-end">
+                      <DollarSign className="w-3 h-3" /> Tarifa Promocional em Dinheiro
+                    </span>
+                  ) : (
+                    'Tarifa em Milhas'
+                  )}
                 </span>
-                <div className="text-3xl font-black text-white font-mono tracking-tight flex items-baseline lg:justify-end gap-1.5 mt-0.5">
-                  <span>{current.miles.toLocaleString('pt-BR')}</span>
-                  <span className="text-sm font-sans text-[#22C55E] uppercase font-bold">
-                    {prog?.unitLabel || 'pts'}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-300 mt-0.5 flex items-center gap-1 lg:justify-end">
-                  <span className="text-[#38BDF8] font-bold">+</span>
-                  <span>R$ {current.cashAmount.toFixed(2)} taxas o trecho</span>
-                </p>
+                
+                {current.paymentType === 'cash' ? (
+                  <div>
+                    <div className="text-3xl font-black text-[#22C55E] font-mono tracking-tight flex items-baseline lg:justify-end gap-1.5 mt-0.5">
+                      <span>R$ {(current.cashPriceTotal || 309).toLocaleString('pt-BR')}</span>
+                      <span className="text-sm font-sans text-emerald-300 uppercase font-bold">
+                        total c/ taxas
+                      </span>
+                    </div>
+                    <p className="text-xs text-purple-300 mt-0.5 flex items-center gap-1 lg:justify-end">
+                      <span>Equivale a ~{current.miles.toLocaleString('pt-BR')} milhas com pontos</span>
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="text-3xl font-black text-white font-mono tracking-tight flex items-baseline lg:justify-end gap-1.5 mt-0.5">
+                      <span>{current.miles.toLocaleString('pt-BR')}</span>
+                      <span className="text-sm font-sans text-[#22C55E] uppercase font-bold">
+                        {prog?.unitLabel || 'pts'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-0.5 flex items-center gap-1 lg:justify-end">
+                      <span className="text-[#38BDF8] font-bold">+</span>
+                      <span>R$ {current.cashAmount.toFixed(2)} taxas o trecho</span>
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Botão de Urgência de Ação Direta */}
@@ -252,7 +276,9 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
               >
                 <Flame className="w-4 h-4 fill-current shrink-0" />
                 <span className="uppercase tracking-wider">
-                  {seatsCount <= 1
+                  {current.paymentType === 'cash'
+                    ? `Ver Oferta na Agência (R$ ${(current.cashPriceTotal || 309).toLocaleString('pt-BR')})`
+                    : seatsCount <= 1
                     ? 'ÚLTIMO ASSENTO DISPONÍVEL!'
                     : `Apenas ${seatsCount} assentos disponíveis!`}
                 </span>
