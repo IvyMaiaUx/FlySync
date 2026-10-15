@@ -186,18 +186,18 @@ export const AlertChannelSettings: React.FC<AlertChannelSettingsProps> = ({
               {/* Accordion Route Header */}
               <div
                 onClick={() => setExpandedId(isExpanded ? null : search.id)}
-                className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer select-none"
+                className="p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer select-none"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
                   <div className="w-11 h-11 rounded-xl bg-[#220B4E] border border-purple-700/80 flex flex-col items-center justify-center font-mono font-black text-xs text-[#38BDF8] shrink-0 shadow-sm">
                     <span className="leading-tight">{search.origin}</span>
                     <span className="text-[10px] text-[#22C55E] leading-none">➔ {search.destination}</span>
                   </div>
 
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h5 className="text-sm font-bold text-white">{search.title}</h5>
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-950 border border-purple-800 text-purple-300">
+                      <h5 className="text-sm font-bold text-white truncate">{search.title}</h5>
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-950 border border-purple-800 text-purple-300 shrink-0">
                         {prog ? prog.name : 'Qualquer programa'}
                       </span>
                     </div>
@@ -214,9 +214,9 @@ export const AlertChannelSettings: React.FC<AlertChannelSettingsProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2.5 self-end sm:self-center shrink-0">
+                <div className="flex items-center gap-2.5 self-start md:self-center shrink-0">
                   {/* Channels Active Badges */}
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     <span
                       title="Push no Dispositivo"
                       className={`px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 border transition-all ${

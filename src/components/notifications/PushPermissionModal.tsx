@@ -121,19 +121,19 @@ export const PushPermissionModal: React.FC = () => {
       onClose={() => setIsPushModalOpen(false)}
       title="Notificações no celular"
       subtitle="Seja avisado na hora quando aparecer passagem nas suas rotas."
-      size="lg"
+      size="xl"
     >
       <div className="space-y-6 text-slate-200">
         {/* Status Header Banner */}
-        <div className={`p-4 rounded-2xl border transition-all ${
+        <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
           pushPermission === 'granted'
             ? 'bg-emerald-950/40 border-[#22C55E]/60 text-emerald-100 shadow-[0_0_20px_rgba(34,197,94,0.15)]'
             : pushPermission === 'denied'
             ? 'bg-rose-950/40 border-rose-500/60 text-rose-100'
             : 'bg-purple-950/60 border-purple-700/80 text-purple-100'
         }`}>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5 min-w-0 flex-1">
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                 pushPermission === 'granted'
                   ? 'bg-[#22C55E] text-slate-950 shadow-md'
@@ -150,15 +150,15 @@ export const PushPermissionModal: React.FC = () => {
                 )}
               </div>
 
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold text-white">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-sm font-bold text-white leading-tight">
                     {pushPermission === 'granted' && 'Notificações Push Nativas Concedidas'}
                     {pushPermission === 'denied' && 'Notificações Bloqueadas no Navegador'}
                     {pushPermission === 'default' && 'Permissão de Notificação Push Pendente'}
                     {pushPermission === 'unsupported' && 'Navegador Sem Suporte a Web Push'}
                   </h3>
-                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full shrink-0 ${
                     pushPermission === 'granted'
                       ? 'bg-[#22C55E]/20 text-[#22C55E] border border-[#22C55E]/40'
                       : pushPermission === 'denied'
@@ -169,7 +169,7 @@ export const PushPermissionModal: React.FC = () => {
                   </span>
                 </div>
 
-                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
                   {pushPermission === 'granted' && (
                     'O FlySync está conectado em tempo real para enviar alertas no seu celular ou desktop no instante em que as companhias liberarem novas vagas.'
                   )}
@@ -186,11 +186,11 @@ export const PushPermissionModal: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 shrink-0 self-start md:self-center pt-1 md:pt-0">
               {pushPermission === 'default' && (
                 <button
                   onClick={handleRequestPermission}
-                  className="px-4 py-2 text-xs font-bold text-slate-950 bg-[#22C55E] hover:bg-emerald-400 rounded-xl shadow-[0_0_15px_rgba(34,197,94,0.4)] transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="px-4 py-2 text-xs font-bold text-slate-950 bg-[#22C55E] hover:bg-emerald-400 rounded-xl shadow-[0_0_15px_rgba(34,197,94,0.4)] transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
                 >
                   <Zap className="w-4 h-4 fill-slate-950" />
                   <span>Conceder Permissão</span>
@@ -200,7 +200,7 @@ export const PushPermissionModal: React.FC = () => {
               {pushPermission === 'denied' && (
                 <button
                   onClick={() => setShowTroubleshooting(!showTroubleshooting)}
-                  className="px-3 py-1.5 text-xs font-semibold text-rose-200 bg-rose-900/40 hover:bg-rose-900/60 border border-rose-700/60 rounded-xl transition-colors flex items-center gap-1.5"
+                  className="px-3 py-1.5 text-xs font-semibold text-rose-200 bg-rose-900/40 hover:bg-rose-900/60 border border-rose-700/60 rounded-xl transition-colors flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
                 >
                   <HelpCircle className="w-3.5 h-3.5" />
                   <span>Como Desbloquear</span>
@@ -210,7 +210,7 @@ export const PushPermissionModal: React.FC = () => {
               <button
                 onClick={() => handleRunTest()}
                 disabled={isTesting}
-                className="px-3.5 py-2 text-xs font-semibold text-slate-200 bg-[#160833] hover:bg-purple-900/60 border border-purple-800/80 rounded-xl transition-colors flex items-center gap-1.5 shadow-sm"
+                className="px-3.5 py-2 text-xs font-semibold text-slate-200 hover:text-white bg-[#160833] hover:bg-purple-900/60 border border-purple-800/80 rounded-xl transition-colors flex items-center gap-1.5 shadow-sm whitespace-nowrap cursor-pointer"
                 title="Dispara um alerta sonoro e notificação de teste"
               >
                 {isTesting ? (
