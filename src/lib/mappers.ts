@@ -133,7 +133,7 @@ export const toOffer = (r: Row): FlightOffer => ({
   availabilityStatus: r.availability_status,
   observedAt: r.observed_at,
   verifiedAt: r.verified_at,
-  bookingUrl: buildOfficialBookingUrl({
+  bookingUrl: r.booking_url || buildOfficialBookingUrl({
     origin: r.origin,
     destination: r.destination,
     departureDate: r.departure_date,

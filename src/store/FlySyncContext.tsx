@@ -197,7 +197,7 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
           .select('*')
           .gte('departure_date', todayStr)
           .order('departure_date', { ascending: true })
-          .limit(200),
+          .limit(1000),
         supabase.from('offer_observations').select('*').order('observed_at', { ascending: true }).limit(500)
       ]);
 

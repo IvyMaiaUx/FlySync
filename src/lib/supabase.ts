@@ -1,9 +1,15 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const url = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim() || '';
-const key = (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined)?.trim() || '';
+const defaultUrl = 'https://kcbuuwftyoyqisltqcuh.supabase.co';
+const defaultKey = 'sb_publishable_v6ZQ0_gJJsPKpfZQuFhO6A_7SiJENV-';
 
-/** true quando o .env.local tem URL e chave válidas */
+const envUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim();
+const envKey = (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined)?.trim();
+
+const url = envUrl && envUrl.length > 10 ? envUrl : defaultUrl;
+const key = envKey && envKey.length > 20 ? envKey : defaultKey;
+
+/** true quando URL e chave são válidas */
 export const isSupabaseConfigured = /^https:\/\/.+\.supabase\.co\/?$/.test(url) && key.length > 20;
 
 // Quando não configurado, cria um cliente "vazio" só para não quebrar os imports;
