@@ -94,6 +94,14 @@ export const RouteCalendarModal: React.FC<RouteCalendarModalProps> = ({
     return Math.min(...routeOffers.map(o => o.miles));
   }, [routeOffers]);
 
+  const isCashRoute = (routeOffers[0]?.paymentType || initialOffer?.paymentType) === 'cash';
+
+  const globalLowestCash = useMemo(() => {
+    if (routeOffers.length === 0) return 0;
+    const cashPrices = routeOffers.map(o => o.cashPriceTotal || o.miles).filter(p => p > 0);
+    return cashPrices.length > 0 ? Math.min(...cashPrices) : 0;
+  }, [routeOffers]);
+
   // Best month to travel (lowest minimum miles)
   const bestMonth = useMemo(() => {
     if (monthsData.length === 0) return null;
@@ -162,7 +170,11 @@ export const RouteCalendarModal: React.FC<RouteCalendarModalProps> = ({
             <div className="p-3.5 rounded-xl bg-[#0F0322] border border-emerald-500/30 text-right shrink-0">
               <span className="text-[10px] uppercase font-bold text-slate-400 block">Menor Tarifa da Rota</span>
               <div className="text-2xl font-black text-[#22C55E] font-mono tabular-nums">
-                {globalLowestMiles.toLocaleString('pt-BR')} <span className="text-xs font-sans font-normal text-slate-400">pts</span>
+                {isCashRoute ? (
+                  <>R$ {globalLowestCash.toLocaleString('pt-BR')} <span className="text-xs font-sans font-bold text-emerald-300 uppercase">total</span></>
+                ) : (
+                  <>{globalLowestMiles.toLocaleString('pt-BR')} <span className="text-xs font-sans font-normal text-slate-400">pts</span></>
+                )}
               </div>
               {bestMonth && (
                 <div className="text-[11px] text-cyan-300 font-medium mt-0.5">
@@ -179,7 +191,11 @@ export const RouteCalendarModal: React.FC<RouteCalendarModalProps> = ({
               <p className="text-[11px] leading-relaxed">
                 <strong className="text-white">Nossa dica: </strong>
                 <span className="text-emerald-300 font-semibold">Comprar Agora. </span>
-                O menor preço é {globalLowestMiles.toLocaleString('pt-BR')} milhas e deve subir nas próximas 2 semanas.
+                {isCashRoute ? (
+                  <>O menor preço é R$ {globalLowestCash.toLocaleString('pt-BR')} (com taxas inclusas) e deve subir nas próximas 2 semanas.</>
+                ) : (
+                  <>O menor preço é {globalLowestMiles.toLocaleString('pt-BR')} milhas e deve subir nas próximas 2 semanas.</>
+                )}
               </p>
             </div>
             <button
@@ -347,16 +363,30 @@ export const RouteCalendarModal: React.FC<RouteCalendarModalProps> = ({
                     {/* Pricing */}
                     <div className="py-2.5 flex items-baseline justify-between">
                       <div>
-                        <div className="text-2xl font-black text-white font-mono tabular-nums tracking-tight">
-                          {offer.miles.toLocaleString('pt-BR')}
-                          <span className="text-xs font-sans text-[#22C55E] ml-1 uppercase">
-                            {prog?.unitLabel || 'pts'}
-                          </span>
-                        </div>
-                        <div className="text-[11px] text-slate-300 font-medium mt-0.5 flex items-center gap-1">
-                          <span className="text-[#38BDF8] font-bold">+</span>
-                          <span>R$ {offer.cashAmount.toFixed(2)} taxas o trecho</span>
-                        </div>
+                        {offer.paymentType === 'cash' ? (
+                          <div>
+                            <div className="text-2xl font-black text-[#22C55E] font-mono tabular-nums tracking-tight flex items-baseline gap-1.5">
+                              <span>R$ {(offer.cashPriceTotal || offer.miles).toLocaleString('pt-BR')}</span>
+                              <span className="text-[10px] text-emerald-300 uppercase font-bold">total c/ taxas</span>
+                            </div>
+                            <div className="text-[11px] text-purple-300 font-medium mt-0.5">
+                              Equivale a ~{offer.miles.toLocaleString('pt-BR')} milhas
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="text-2xl font-black text-white font-mono tabular-nums tracking-tight">
+                              {offer.miles.toLocaleString('pt-BR')}
+                              <span className="text-xs font-sans text-[#22C55E] ml-1 uppercase">
+                                {prog?.unitLabel || 'pts'}
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-300 font-medium mt-0.5 flex items-center gap-1">
+                              <span className="text-[#38BDF8] font-bold">+</span>
+                              <span>R$ {offer.cashAmount.toFixed(2)} taxas o trecho</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {offer.seatsLeft && offer.seatsLeft <= 3 && (
@@ -381,7 +411,7 @@ export const RouteCalendarModal: React.FC<RouteCalendarModalProps> = ({
                       onClick={() => handleBookingClick(offer)}
                       className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-950 bg-[#22C55E] hover:bg-emerald-400 transition-colors flex items-center gap-1.5 shadow-[0_0_10px_rgba(34,197,94,0.3)]"
                     >
-                      <span>Emitir no Site Oficial</span>
+                      <span>{offer.paymentType === 'cash' ? 'Ver Oferta na Agência' : 'Emitir no Site Oficial'}</span>
                       <ExternalLink className="w-3.5 h-3.5 stroke-[2.5]" />
                     </button>
                   </div>

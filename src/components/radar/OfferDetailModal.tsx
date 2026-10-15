@@ -238,7 +238,7 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                 {current.paymentType === 'cash' ? (
                   <div>
                     <div className="text-3xl font-black text-[#22C55E] font-mono tracking-tight flex items-baseline lg:justify-end gap-1.5 mt-0.5">
-                      <span>R$ {(current.cashPriceTotal || 309).toLocaleString('pt-BR')}</span>
+                      <span>R$ {(current.cashPriceTotal || current.miles).toLocaleString('pt-BR')}</span>
                       <span className="text-sm font-sans text-emerald-300 uppercase font-bold">
                         total c/ taxas
                       </span>
@@ -277,7 +277,7 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
                 <Flame className="w-4 h-4 fill-current shrink-0" />
                 <span className="uppercase tracking-wider">
                   {current.paymentType === 'cash'
-                    ? `Ver Oferta na Agência (R$ ${(current.cashPriceTotal || 309).toLocaleString('pt-BR')})`
+                    ? `Ver Oferta na Agência (R$ ${(current.cashPriceTotal || current.miles).toLocaleString('pt-BR')})`
                     : seatsCount <= 1
                     ? 'ÚLTIMO ASSENTO DISPONÍVEL!'
                     : `Apenas ${seatsCount} assentos disponíveis!`}

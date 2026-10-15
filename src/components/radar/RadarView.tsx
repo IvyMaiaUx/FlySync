@@ -220,7 +220,8 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
     }>();
 
     filteredOffers.forEach(o => {
-      const key = `${o.origin}-${o.destination}`;
+      const pType = o.paymentType === 'cash' ? 'cash' : 'miles';
+      const key = `${o.origin}-${o.destination}-${pType}`;
       if (!map.has(key)) {
         map.set(key, {
           routeKey: key,
@@ -831,7 +832,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
                         {group.offers[0]?.paymentType === 'cash' ? (
                           <div>
                             <div className="text-2xl font-black text-[#22C55E] font-mono tabular-nums tracking-tight flex items-baseline gap-1.5">
-                              <span>R$ {(group.offers[0]?.cashPriceTotal || group.lowestCashPrice || 309).toLocaleString('pt-BR')}</span>
+                              <span>R$ {(group.offers[0]?.cashPriceTotal || group.lowestCashPrice || group.offers[0]?.miles || 389).toLocaleString('pt-BR')}</span>
                               <span className="text-[11px] font-sans text-emerald-300 font-bold uppercase">
                                 total c/ taxas
                               </span>
@@ -1138,7 +1139,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
                           <div>
                             <div className="flex items-baseline gap-1">
                               <span className="text-xl font-black text-[#22C55E] font-mono tabular-nums">
-                                R$ {(offer.cashPriceTotal || 309).toLocaleString('pt-BR')}
+                                R$ {(offer.cashPriceTotal || offer.miles || 389).toLocaleString('pt-BR')}
                               </span>
                               <span className="text-[10px] text-emerald-300 uppercase font-bold">
                                 c/ taxas

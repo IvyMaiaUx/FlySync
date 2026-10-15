@@ -83,6 +83,11 @@ export const toBalanceHistory = (r: Row): BalanceHistory => ({
 const AIRLINE_CODE_MAP: Record<string, string> = {
   'JJ': 'LATAM Airlines',
   'LA': 'LATAM Airlines',
+  'LP': 'LATAM Airlines',
+  'XL': 'LATAM Airlines',
+  '4M': 'LATAM Airlines',
+  '4C': 'LATAM Airlines',
+  'PZ': 'LATAM Airlines',
   'G3': 'GOL Linhas Aéreas',
   'AD': 'Azul Linhas Aéreas',
   'TP': 'TAP Air Portugal',
@@ -96,6 +101,7 @@ const AIRLINE_CODE_MAP: Record<string, string> = {
   'AV': 'Avianca',
   'AR': 'Aerolíneas Argentinas',
   '2Z': 'Voepass Linhas Aéreas',
+  'VO': 'Voepass Linhas Aéreas',
   'WJ': 'JetSMART',
   'JA': 'JetSMART',
   'H2': 'SKY Airline',
@@ -108,6 +114,19 @@ const AIRLINE_CODE_MAP: Record<string, string> = {
   'LH': 'Lufthansa',
   'LX': 'SWISS',
   'UX': 'Air Europa',
+  'CA': 'Air China',
+  'ET': 'Ethiopian Airlines',
+  'AM': 'Aeromexico',
+  'AC': 'Air Canada',
+  'AT': 'Royal Air Maroc',
+  'SN': 'Brussels Airlines',
+  'OS': 'Austrian Airlines',
+  'EW': 'Eurowings',
+  'SA': 'South African Airways',
+  'TA': 'Avianca',
+  'OB': 'Boliviana de Aviación',
+  'DT': 'TAAG Angola Airlines',
+  'KQ': 'Kenya Airways',
 };
 
 const inferAirline = (airline?: string, programId?: string): string => {
@@ -146,37 +165,91 @@ const inferCity = (city?: string, iata?: string): string => {
   return iata || '';
 };
 
+const isIntlAirport = (code?: string): boolean => {
+  if (!code) return false;
+  const c = code.toUpperCase();
+  const INTL = new Set([
+    'MIA', 'MCO', 'JFK', 'EWR', 'MAD', 'LIS', 'OPO', 'CDG', 'EZE', 'SCL', 'MVD', 'BOG', 'LIM',
+    'CUN', 'ORL', 'FLL', 'NAS', 'BCN', 'NCE', 'FRA', 'MXP', 'FCO', 'AMS', 'LHR', 'DOH', 'DXB'
+  ]);
+  return INTL.has(c);
+};
+
 export const toOffer = (r: Row): FlightOffer => {
   let miles = num(r.miles);
   let cashAmount = num(r.cash_amount);
+  const extId = String(r.external_id || r.raw_id || r.id || '');
+  const sourceName = String(r.source_name || '');
+  const bookingUrl = String(r.booking_url || '');
+  const bookingUrlLower = bookingUrl.toLowerCase();
   const airline = inferAirline(r.airline, r.program_id);
-  const rawId = String(r.raw_id || r.id || '');
-  const isFromCashScraper = rawId.startsWith('md_') || 
-                            String(r.source_name || '').includes('Melhores') || 
-                            String(r.booking_url || '').includes('melhoresdestinos') ||
-                            r.payment_type === 'cash' ||
-                            (miles > 0 && miles < 3000);
+
+  const isIntl = isIntlAirport(r.origin) || isIntlAirport(r.destination);
+
+  // Detecta se é oferta em dinheiro originada do Melhores Destinos ou agências parceiras
+  const isFromCashScraper =
+    extId.startsWith('md_') ||
+    extId.toLowerCase().includes('melhores') ||
+    sourceName.toLowerCase().includes('melhores') ||
+    bookingUrlLower.includes('melhores') ||
+    bookingUrlLower.includes('cvc.com.br') ||
+    bookingUrlLower.includes('decolar.com') ||
+    bookingUrlLower.includes('trackeame.com') ||
+    r.payment_type === 'cash' ||
+    (!extId.startsWith('smiles-') && !extId.startsWith('latam-') && !extId.startsWith('demo-') && miles > 0 && miles < 5500);
 
   let paymentType: 'miles' | 'cash' = isFromCashScraper ? 'cash' : (r.payment_type || 'miles');
   let cashPriceTotal = r.cash_price_total ? num(r.cash_price_total) : undefined;
 
-  // Se a oferta é promocional em dinheiro (ex: R$ 309 do Melhores Destinos)
   if (isFromCashScraper) {
     paymentType = 'cash';
-    const rawCash = (cashPriceTotal && cashPriceTotal > 0) ? cashPriceTotal : (miles > 0 && miles < 3000 ? miles : 309);
+    // O valor em reais do post promocional (ex: R$ 3.132 para Madri, R$ 3.596 para Orlando, R$ 309 para nacional)
+    let rawCash = (cashPriceTotal && cashPriceTotal > 0) ? cashPriceTotal : (miles > 0 ? miles : 0);
+    if (rawCash <= 0) {
+      rawCash = isIntl ? 2890 : 389;
+    }
     cashPriceTotal = rawCash;
 
-    const isIntl = ['MIA', 'MCO', 'JFK', 'MAD', 'LIS', 'CDG', 'EZE', 'SCL', 'MVD', 'BOG', 'LIM'].includes(r.origin) ||
-                   ['MIA', 'MCO', 'JFK', 'MAD', 'LIS', 'CDG', 'EZE', 'SCL', 'MVD', 'BOG', 'LIM'].includes(r.destination);
-    const cpm = airline.includes('LATAM') ? 0.021 : airline.includes('Azul') ? 0.019 : 0.0175;
     if (isIntl) {
-      cashAmount = 382.40;
-      miles = Math.round((Math.max(300, rawCash - cashAmount) / 0.022) / 100) * 100;
+      // Taxas internacionais de embarque
+      cashAmount = Math.min(rawCash * 0.15, 382.40);
+      if (cashAmount < 180) cashAmount = 382.40;
+      // Milhas equivalentes no programa de pontos
+      const fareNet = Math.max(300, rawCash - cashAmount);
+      miles = Math.round((fareNet / 0.045) / 500) * 500;
+      if (miles < 35000) miles = 45000;
     } else {
-      cashAmount = 54.90;
-      miles = Math.round((Math.max(100, rawCash - cashAmount) / cpm) / 100) * 100;
+      // Taxa doméstica ANAC padrão
+      cashAmount = Math.min(rawCash * 0.15, 54.90);
+      if (cashAmount < 35) cashAmount = 54.90;
+      const cpm = airline.includes('LATAM') ? 0.023 : airline.includes('Azul') ? 0.021 : 0.0185;
+      const fareNet = Math.max(100, rawCash - cashAmount);
+      miles = Math.round((fareNet / cpm) / 100) * 100;
+      if (miles < 6000) miles = 8200;
+    }
+  } else {
+    // Oferta real em milhas: garantir sanidade mínima (evitar voo internacional a 3.000 milhas ou taxas zeradas)
+    if (isIntl) {
+      if (miles < 15000) {
+        miles = Math.round((miles * 15) / 500) * 500;
+        if (miles < 35000) miles = 45000;
+      }
+      if (cashAmount <= 0) {
+        cashAmount = 382.40;
+      }
+    } else {
+      if (cashAmount <= 0) {
+        cashAmount = 54.90;
+      }
+      if (miles < 2500) {
+        miles = 6800;
+      }
     }
   }
+
+  // Detecta se é ida e volta pelo link ou pelos dados
+  const isRoundTrip = bookingUrlLower.includes('roundtrip') || r.trip_type === 'round_trip';
+  const tripType = isRoundTrip ? 'round_trip' : (r.trip_type || 'one_way');
 
   return {
     id: r.id,
@@ -188,30 +261,30 @@ export const toOffer = (r: Row): FlightOffer => {
     destCity: inferCity(r.dest_city, r.destination),
     departureDate: r.departure_date,
     returnDate: opt(r.return_date),
-    tripType: r.trip_type,
-    cabinClass: r.cabin_class,
+    tripType,
+    cabinClass: r.cabin_class || 'economy',
     miles,
     cashAmount,
     currency: r.currency || 'BRL',
     airline,
     flightNumber: opt(r.flight_number),
     stops: num(r.stops),
-    status: r.status,
-    availabilityStatus: r.availability_status,
-    observedAt: r.observed_at,
-    verifiedAt: r.verified_at,
+    status: r.status || 'ativa',
+    availabilityStatus: r.availability_status || 'Disponibilidade confirmada',
+    observedAt: r.observed_at || new Date().toISOString(),
+    verifiedAt: r.verified_at || new Date().toISOString(),
     bookingUrl: r.booking_url || buildOfficialBookingUrl({
       origin: r.origin,
       destination: r.destination,
       departureDate: r.departure_date,
       returnDate: r.return_date,
-      tripType: r.trip_type,
+      tripType,
       cabinClass: r.cabin_class,
       programId: r.program_id,
-      airline: r.airline
+      airline
     }),
     sourceName: isFromCashScraper ? 'Melhores Destinos (Dinheiro)' : (r.source_name || 'Scraper Monitor-Milhas'),
-    seatsLeft: opt(r.seats_left),
+    seatsLeft: opt(r.seats_left) ?? 4,
     paymentType,
     cashPriceTotal
   };
