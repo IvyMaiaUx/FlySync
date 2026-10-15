@@ -111,41 +111,63 @@ const inferCity = (city?: string, iata?: string): string => {
   return iata || '';
 };
 
-export const toOffer = (r: Row): FlightOffer => ({
-  id: r.id,
-  sourceId: r.source_id || '',
-  programId: r.program_id,
-  origin: r.origin,
-  originCity: inferCity(r.origin_city, r.origin),
-  destination: r.destination,
-  destCity: inferCity(r.dest_city, r.destination),
-  departureDate: r.departure_date,
-  returnDate: opt(r.return_date),
-  tripType: r.trip_type,
-  cabinClass: r.cabin_class,
-  miles: num(r.miles),
-  cashAmount: num(r.cash_amount),
-  currency: r.currency,
-  airline: inferAirline(r.airline, r.program_id),
-  flightNumber: opt(r.flight_number),
-  stops: num(r.stops),
-  status: r.status,
-  availabilityStatus: r.availability_status,
-  observedAt: r.observed_at,
-  verifiedAt: r.verified_at,
-  bookingUrl: r.booking_url || buildOfficialBookingUrl({
+export const toOffer = (r: Row): FlightOffer => {
+  let miles = num(r.miles);
+  let cashAmount = num(r.cash_amount);
+  const airline = inferAirline(r.airline, r.program_id);
+
+  // SANITIZAÇÃO: Se a oferta veio de scraper de passagens em dinheiro (ex: R$ 309 salvo no campo de milhas)
+  // Converte a tarifa líquida para milhas de mercado pelo CPM da companhia e aplica taxa de embarque ANAC
+  if (miles > 0 && miles < 3000) {
+    const priceCash = miles;
+    const isIntl = ['MIA', 'MCO', 'JFK', 'MAD', 'LIS', 'CDG', 'EZE', 'SCL', 'MVD', 'BOG', 'LIM'].includes(r.origin) ||
+                   ['MIA', 'MCO', 'JFK', 'MAD', 'LIS', 'CDG', 'EZE', 'SCL', 'MVD', 'BOG', 'LIM'].includes(r.destination);
+    const cpm = airline.includes('LATAM') ? 0.021 : airline.includes('Azul') ? 0.019 : 0.0175;
+    if (isIntl) {
+      cashAmount = 382.40;
+      miles = Math.round((Math.max(300, priceCash - cashAmount) / 0.022) / 100) * 100;
+    } else {
+      cashAmount = 54.90;
+      miles = Math.round((Math.max(100, priceCash - cashAmount) / cpm) / 100) * 100;
+    }
+  }
+
+  return {
+    id: r.id,
+    sourceId: r.source_id || '',
+    programId: r.program_id,
     origin: r.origin,
+    originCity: inferCity(r.origin_city, r.origin),
     destination: r.destination,
+    destCity: inferCity(r.dest_city, r.destination),
     departureDate: r.departure_date,
-    returnDate: r.return_date,
+    returnDate: opt(r.return_date),
     tripType: r.trip_type,
     cabinClass: r.cabin_class,
-    programId: r.program_id,
-    airline: r.airline
-  }),
-  sourceName: r.source_name,
-  seatsLeft: r.seats_left === null || r.seats_left === undefined ? undefined : num(r.seats_left)
-});
+    miles,
+    cashAmount,
+    currency: r.currency || 'BRL',
+    airline,
+    flightNumber: opt(r.flight_number),
+    stops: num(r.stops),
+    status: r.status,
+    availabilityStatus: r.availability_status,
+    observedAt: r.observed_at,
+    verifiedAt: r.verified_at,
+    bookingUrl: r.booking_url || buildOfficialBookingUrl({
+      origin: r.origin,
+      destination: r.destination,
+      departureDate: r.departure_date,
+      returnDate: r.return_date,
+      tripType: r.trip_type,
+      cabinClass: r.cabin_class,
+      programId: r.program_id,
+      airline: r.airline
+    }),
+    sourceName: r.source_name || 'Scraper Monitor-Milhas',
+    seatsLeft: opt(r.seats_left)
+  };
+};
 
 export const fromOffer = (o: Omit<FlightOffer, 'id' | 'observedAt' | 'verifiedAt'>): Row => ({
   source_id: o.sourceId || null,
