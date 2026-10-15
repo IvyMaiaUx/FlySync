@@ -32,6 +32,16 @@ const detectProgram = (programId?: string, airline?: string): 'smiles' | 'latam'
   return 'other';
 };
 
+export const isBookingLinkSupported = (paramsOrOffer?: { airline?: string; programId?: string } | null): boolean => {
+  if (!paramsOrOffer) return true;
+  const p = (paramsOrOffer.programId || '').toLowerCase();
+  const a = (paramsOrOffer.airline || '').toLowerCase();
+  if (p.includes('latam') || a.includes('latam')) {
+    return false;
+  }
+  return true;
+};
+
 /**
  * Gera URL oficial de resgate de milhas pré-preenchida para a data e rota selecionadas.
  */
@@ -66,23 +76,8 @@ export const buildOfficialBookingUrl = (params: BookingUrlParams): string => {
     }
 
     case 'latam': {
-      // LATAM Airlines: portal brasileiro com redemption=true (LATAM Pass)
-      const baseUrl = 'https://www.latamairlines.com/br/pt/oferta-voos';
-      const outboundIso = `${date}T12:00:00.000Z`;
-      const query = new URLSearchParams({
-        origin,
-        destination,
-        outbound: outboundIso,
-        inbound: isRoundTrip && returnDate ? `${returnDate}T12:00:00.000Z` : 'null',
-        adt: '1',
-        chd: '0',
-        inf: '0',
-        trip: isRoundTrip ? 'RT' : 'OW',
-        cabin: cabin === 'business' ? 'Business' : 'Economy',
-        redemption: 'true',
-        sort: 'RECOMMENDED'
-      });
-      return `${baseUrl}?${query.toString()}`;
+      // LATAM Pass: busca direta manual pelo usuário no app/site (sem deep link pré-preenchido)
+      return '';
     }
 
     case 'azul': {
@@ -169,6 +164,9 @@ export const buildGoogleFlightsUrl = (params: BookingUrlParams): string => {
  * Sempre garante que a data selecionada na tela está contida no link.
  */
 export const getEffectiveBookingUrl = (offer: FlightOffer): string => {
+  if (!isBookingLinkSupported(offer)) {
+    return '';
+  }
   return buildOfficialBookingUrl({
     origin: offer.origin,
     destination: offer.destination,

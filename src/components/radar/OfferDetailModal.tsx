@@ -5,7 +5,7 @@ import React, { useState, useMemo } from 'react';
 import { useFlySync } from '../../store/FlySyncContext';
 import { Modal } from '../common/Modal';
 import { FlightOffer } from '../../types';
-import { getEffectiveBookingUrl, buildGoogleFlightsUrl } from '../../utils/bookingUrls';
+import { getEffectiveBookingUrl, buildGoogleFlightsUrl, isBookingLinkSupported } from '../../utils/bookingUrls';
 import {
   Plane,
   Calendar,
@@ -158,6 +158,7 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
 
   const seatsCount = current.seatsLeft ?? 4;
   const isScarcityHigh = seatsCount <= 3;
+  const isLatam = !isBookingLinkSupported(current);
 
   return (
     <Modal
@@ -634,7 +635,15 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
         <div className="p-3.5 rounded-xl bg-[#0D021C] border border-purple-900/60 flex items-start gap-2.5">
           <Info className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
           <p className="text-xs text-slate-300 leading-relaxed">
-            <strong className="text-white">Emissão Direta Pré-Preenchida:</strong> O FlySync redireciona diretamente ao canal oficial da <strong>{current.airline} ({prog?.name})</strong> com a rota <strong>{current.origin} ➔ {current.destination}</strong> e a data selecionada (<strong>{formatDate(current.departureDate)}</strong>) já configurados no link.
+            {isLatam ? (
+              <>
+                <strong className="text-white">Busca Direta na LATAM:</strong> Para emissões com a <strong>{current.airline} ({prog?.name})</strong>, consulte a rota <strong>{current.origin} ➔ {current.destination}</strong> na data selecionada (<strong>{formatDate(current.departureDate)}</strong>) diretamente no site ou app oficial da LATAM Pass.
+              </>
+            ) : (
+              <>
+                <strong className="text-white">Emissão Direta Pré-Preenchida:</strong> O FlySync redireciona diretamente ao canal oficial da <strong>{current.airline} ({prog?.name})</strong> com a rota <strong>{current.origin} ➔ {current.destination}</strong> e a data selecionada (<strong>{formatDate(current.departureDate)}</strong>) já configurados no link.
+              </>
+            )}
           </p>
         </div>
 
@@ -663,16 +672,23 @@ export const OfferDetailModal: React.FC<OfferDetailModalProps> = ({
             </button>
           </div>
 
-          <button
-            type="button"
-            onClick={handleGoToBooking}
-            className="w-full sm:w-auto px-5 py-3 text-xs font-black text-slate-950 bg-[#22C55E] hover:bg-emerald-400 rounded-xl shadow-[0_0_20px_rgba(34,197,94,0.35)] transition-all flex items-center justify-center gap-2 transform hover:scale-[1.02]"
-            title={`Abrir página oficial de emissão para ${formatDate(current.departureDate)}`}
-          >
-            <Flame className="w-4 h-4 fill-slate-950" />
-            <span>Emitir no Site Oficial ({formatDate(current.departureDate)})</span>
-            <ExternalLink className="w-3.5 h-3.5 stroke-[2.5]" />
-          </button>
+          {!isLatam ? (
+            <button
+              type="button"
+              onClick={handleGoToBooking}
+              className="w-full sm:w-auto px-5 py-3 text-xs font-black text-slate-950 bg-[#22C55E] hover:bg-emerald-400 rounded-xl shadow-[0_0_20px_rgba(34,197,94,0.35)] transition-all flex items-center justify-center gap-2 transform hover:scale-[1.02]"
+              title={`Abrir página oficial de emissão para ${formatDate(current.departureDate)}`}
+            >
+              <Flame className="w-4 h-4 fill-slate-950" />
+              <span>Emitir no Site Oficial ({formatDate(current.departureDate)})</span>
+              <ExternalLink className="w-3.5 h-3.5 stroke-[2.5]" />
+            </button>
+          ) : (
+            <div className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-purple-950/70 border border-purple-800 text-slate-300 text-xs flex items-center justify-center gap-2">
+              <Building2 className="w-4 h-4 text-[#E21238] shrink-0" />
+              <span>Pesquise a data <strong>{formatDate(current.departureDate)}</strong> no app da LATAM</span>
+            </div>
+          )}
         </div>
       </div>
     </Modal>
