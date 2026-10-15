@@ -766,6 +766,16 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
         if (o.destination.toUpperCase() !== search.destination.toUpperCase()) return false;
         if (o.miles > search.maxMiles) return false;
         if (search.programId && o.programId !== search.programId) return false;
+        if (search.tripType && o.tripType !== search.tripType) return false;
+        if (search.cabinClass) {
+          const allowedCabins = search.cabinClass.split(',').map(c => c.trim());
+          if (!allowedCabins.includes(o.cabinClass)) return false;
+        }
+        if (search.departureMonth) {
+          const allowedMonths = search.departureMonth.split(',').map(m => m.trim());
+          const offerMonth = o.departureDate.slice(0, 7);
+          if (!allowedMonths.includes(offerMonth)) return false;
+        }
         return true;
       });
 

@@ -109,7 +109,8 @@ export interface SavedSearch {
   destination: string;
   maxMiles: number;
   programId?: string; // empty means any program
-  cabinClass?: CabinClass;
+  cabinClass?: CabinClass | string;
+  tripType?: TripType;
   departureMonth?: string;
   isActive: boolean;
   pushEnabled?: boolean;
