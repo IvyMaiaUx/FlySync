@@ -135,7 +135,7 @@ export const toOffer = (r: Row): FlightOffer => ({
   verifiedAt: r.verified_at,
   bookingUrl: !isBookingLinkSupported({ airline: r.airline, programId: r.program_id })
     ? undefined
-    : (r.booking_url && r.departure_date && r.booking_url.includes(r.departure_date))
+    : (r.booking_url && !r.booking_url.includes('/voos/') && !r.booking_url.includes('/reserva-de-voos') && r.departure_date && r.booking_url.includes(r.departure_date))
       ? r.booking_url
       : (buildOfficialBookingUrl({
           origin: r.origin,

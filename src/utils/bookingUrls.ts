@@ -81,52 +81,18 @@ export const buildOfficialBookingUrl = (params: BookingUrlParams): string => {
     }
 
     case 'azul': {
-      // Azul Fidelidade: seleção com pontos
-      const baseUrl = 'https://www.voeazul.com.br/br/pt/home/selecao-voo';
-      const query = new URLSearchParams({
-        origin,
-        destination,
-        departureDate: date,
-        fareType: 'POINTS',
-        adults: '1',
-        tripType: isRoundTrip ? 'RT' : 'OW'
-      });
-      if (isRoundTrip && returnDate) {
-        query.set('returnDate', returnDate);
-      }
-      return `${baseUrl}?${query.toString()}`;
+      // Azul Fidelidade: portal oficial de passagens e resgate com pontos
+      return 'https://www.voeazul.com.br/br/pt/home';
     }
 
     case 'tap': {
-      // TAP Miles&Go
-      const baseUrl = 'https://www.flytap.com/pt-br/reserva-de-voos';
-      const query = new URLSearchParams({
-        origin,
-        destination,
-        departureDate: date,
-        useMiles: 'true',
-        adults: '1'
-      });
-      if (isRoundTrip && returnDate) {
-        query.set('returnDate', returnDate);
-      }
-      return `${baseUrl}?${query.toString()}`;
+      // TAP Miles&Go: portal oficial de emissão com milhas
+      return 'https://www.flytap.com/pt-br/miles-and-go';
     }
 
     case 'iberia': {
-      // Iberia Plus (Avios)
-      const baseUrl = 'https://www.iberia.com/br/voos/';
-      const query = new URLSearchParams({
-        origin,
-        destination,
-        dateDeparture: date,
-        useAvios: 'true',
-        adults: '1'
-      });
-      if (isRoundTrip && returnDate) {
-        query.set('dateReturn', returnDate);
-      }
-      return `${baseUrl}?${query.toString()}`;
+      // Iberia Plus (Avios): portal oficial de busca e resgate com Avios
+      return 'https://www.iberia.com/br/';
     }
 
     default: {
