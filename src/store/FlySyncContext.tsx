@@ -94,6 +94,7 @@ export interface FlySyncContextType {
   observations: OfferObservation[];
   selectedOffer: FlightOffer | null;
   setSelectedOffer: (offer: FlightOffer | null) => void;
+  refreshOffers: () => Promise<void>;
   adminCreateOffer: (offerData: Omit<FlightOffer, 'id' | 'observedAt' | 'verifiedAt'>) => Promise<boolean>;
   adminUpdateOfferStatus: (offerId: string, status: OfferStatus) => Promise<void>;
   trackOutboundClick: (offerId: string) => void;
@@ -1053,6 +1054,7 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
         observations,
         selectedOffer,
         setSelectedOffer,
+        refreshOffers: fetchPublicData,
         adminCreateOffer,
         adminUpdateOfferStatus,
         trackOutboundClick,

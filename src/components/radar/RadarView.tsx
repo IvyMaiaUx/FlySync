@@ -40,8 +40,20 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
     setSelectedOffer,
     savedSearches,
     observations,
-    openPushModalForRoute
+    openPushModalForRoute,
+    refreshOffers
   } = useFlySync();
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshOffers();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   // Filter States
   const [originSearch, setOriginSearch] = useState<string>('');
@@ -393,8 +405,20 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
             </button>
           </div>
 
-          <div className="text-[11px] text-slate-400 font-medium">
-            Exibindo <strong>{filteredOffers.length}</strong> {filteredOffers.length === 1 ? 'tarifa' : 'tarifas'} encontradas
+          <div className="flex items-center gap-3">
+            <div className="text-[11px] text-slate-400 font-medium">
+              Exibindo <strong>{filteredOffers.length}</strong> {filteredOffers.length === 1 ? 'tarifa' : 'tarifas'} encontradas
+            </div>
+            <button
+              type="button"
+              onClick={handleManualRefresh}
+              disabled={isRefreshing}
+              className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#1B0B38] hover:bg-purple-900/60 border border-purple-700/60 text-purple-200 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              title="Sincronizar tarifas em tempo real do banco de dados"
+            >
+              <RotateCcw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[#22C55E]' : ''}`} />
+              <span>{isRefreshing ? 'Sincronizando...' : 'Atualizar'}</span>
+            </button>
           </div>
         </div>
 

@@ -13,6 +13,7 @@ import {
   AuditLog,
   UserProfile
 } from '../types';
+import scrapedOffersData from './scrapedOffers.json';
 
 export const INITIAL_USER: UserProfile = {
   id: 'usr-001',
@@ -264,7 +265,9 @@ export const INITIAL_SOURCES: OfferSource[] = [
   }
 ];
 
-export const INITIAL_OFFERS: FlightOffer[] = [
+export const INITIAL_OFFERS: FlightOffer[] = ((scrapedOffersData as unknown as FlightOffer[])?.length > 0)
+  ? (scrapedOffersData as unknown as FlightOffer[])
+  : [
   {
     id: 'off-001',
     sourceId: 'src-latam-award',
