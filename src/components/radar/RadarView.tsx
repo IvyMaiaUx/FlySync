@@ -49,7 +49,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
   const [selectedProgram, setSelectedProgram] = useState<string>('all');
   const [cabinClass, setCabinClass] = useState<string>('all');
   const [tripType, setTripType] = useState<string>('all');
-  const [maxMiles, setMaxMiles] = useState<number>(150000);
+  const [maxMiles, setMaxMiles] = useState<number>(300000);
   const [selectedMonth, setSelectedMonth] = useState<string>('all'); // e.g. 'all' or '2026-11'
   const [sortBy, setSortBy] = useState<'miles_asc' | 'date_desc' | 'verified_desc' | 'cash_asc'>('miles_asc');
 
@@ -111,7 +111,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
     setSelectedProgram('all');
     setCabinClass('all');
     setTripType('all');
-    setMaxMiles(150000);
+    setMaxMiles(300000);
     setSelectedMonth('all');
     setSortBy('miles_asc');
   };
@@ -159,8 +159,8 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
         return false;
       }
 
-      // Max miles filter
-      if (offer.miles > maxMiles) {
+      // Max miles filter (300k+ = ilimitado, mostra tudo)
+      if (maxMiles < 300000 && offer.miles > maxMiles) {
         return false;
       }
 
@@ -499,15 +499,15 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
           <div className="flex-1 max-w-md">
             <div className="flex items-center justify-between text-xs mb-1">
               <span className="font-semibold text-slate-300">Teto Máximo de Milhas:</span>
-              <span className="font-bold text-[#22C55E] font-mono tabular-nums">
-                até {maxMiles.toLocaleString('pt-BR')} milhas
+              <span className={`font-bold font-mono tabular-nums ${maxMiles >= 300000 ? 'text-purple-300' : 'text-[#22C55E]'}`}>
+                {maxMiles >= 300000 ? 'Sem limite (Todas as milhas)' : `até ${maxMiles.toLocaleString('pt-BR')} milhas`}
               </span>
             </div>
             <input
               type="range"
               min={10000}
-              max={150000}
-              step={5000}
+              max={300000}
+              step={10000}
               value={maxMiles}
               onChange={(e) => setMaxMiles(Number(e.target.value))}
               className="w-full accent-[#22C55E] cursor-pointer"
