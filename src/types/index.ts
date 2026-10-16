@@ -255,8 +255,21 @@ export interface AuditLog {
   actorId: string;
   actorName: string;
   action: string;
-  entityType: 'offer' | 'source' | 'campaign' | 'balance' | 'subscription';
+  entityType: 'offer' | 'source' | 'campaign' | 'balance' | 'subscription' | 'user' | 'broadcast';
   entityId: string;
   details: string;
   createdAt: string;
 }
+
+export interface PushBroadcast {
+  id: string;
+  title: string;
+  message: string;
+  category: 'radar' | 'price_drop' | 'bonus' | 'system';
+  targetPlan: 'all' | 'premium' | 'free';
+  targetRoute?: string;
+  sentAt: string;
+  sentCount: number;
+  openCount: number;
+}
+

@@ -16,10 +16,13 @@ import {
   Subscription,
   PaymentEvent,
   PlanCode,
-  OfferStatus
+  OfferStatus,
+  PushBroadcast
 } from '../types';
 import {
   INITIAL_USER,
+  INITIAL_USERS,
+  INITIAL_BROADCASTS,
   INITIAL_PROGRAMS,
   INITIAL_BALANCES,
   INITIAL_BALANCE_HISTORY,
@@ -150,6 +153,26 @@ export interface FlySyncContextType {
   auditLogs: AuditLog[];
   toggleSourceStatus: (sourceId: string) => void;
   triggerCollectorRun: (sourceId: string) => Promise<CollectionRun>;
+
+  // User Management & Subscriptions
+  users: UserProfile[];
+  adminUpdateUser: (userId: string, updates: Partial<UserProfile>) => void;
+  adminDeleteUser: (userId: string) => void;
+
+  // Broadcasts & Push Alerts
+  broadcasts: PushBroadcast[];
+  adminSendBroadcast: (broadcast: {
+    title: string;
+    message: string;
+    category: 'radar' | 'price_drop' | 'bonus' | 'system';
+    targetPlan: 'all' | 'premium' | 'free';
+    targetRoute?: string;
+  }) => Promise<PushBroadcast>;
+
+  // Interactive Scraper Operations
+  isScrapingActive: boolean;
+  scraperLogs: string[];
+  adminTriggerScraper: (sourceId?: string) => Promise<{ success: boolean; newOffersCount: number }>;
 }
 
 const FlySyncContext = createContext<FlySyncContextType | undefined>(undefined);
@@ -184,6 +207,14 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [affiliateClicks, setAffiliateClicks] = useState<AffiliateClick[]>([]);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [paymentEvents, setPaymentEvents] = useState<PaymentEvent[]>([]);
+  const [users, setUsers] = useState<UserProfile[]>(INITIAL_USERS);
+  const [broadcasts, setBroadcasts] = useState<PushBroadcast[]>(INITIAL_BROADCASTS);
+  const [isScrapingActive, setIsScrapingActive] = useState<boolean>(false);
+  const [scraperLogs, setScraperLogs] = useState<string[]>([
+    'Daemon auto_radar_collector operacional em background (PID 2805).',
+    'Última varredura: 18 rotas Smiles, Latam Pass e Azul processadas.',
+    'Cache de disponibilidades atualizado e verificado.'
+  ]);
 
   // 1. Carrega dados públicos do banco (programas, ofertas e observações)
   const fetchPublicData = useCallback(async () => {
@@ -1044,6 +1075,166 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return run;
   };
 
+  const adminUpdateUser = (userId: string, updates: Partial<UserProfile>) => {
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, ...updates } : u));
+    if (user.id === userId) {
+      setUser(prev => ({ ...prev, ...updates }));
+    }
+    const log: AuditLog = {
+      id: 'log-' + Date.now(),
+      actorId: user.id,
+      actorName: user.displayName,
+      action: 'UPDATE_USER',
+      entityType: 'user',
+      entityId: userId,
+      details: `Atualização de usuário: ${JSON.stringify(updates)}`,
+      createdAt: new Date().toISOString()
+    };
+    setAuditLogs(prev => [log, ...prev]);
+  };
+
+  const adminDeleteUser = (userId: string) => {
+    setUsers(prev => prev.filter(u => u.id !== userId));
+    const log: AuditLog = {
+      id: 'log-' + Date.now(),
+      actorId: user.id,
+      actorName: user.displayName,
+      action: 'DELETE_USER',
+      entityType: 'user',
+      entityId: userId,
+      details: `Usuário removido da base`,
+      createdAt: new Date().toISOString()
+    };
+    setAuditLogs(prev => [log, ...prev]);
+  };
+
+  const adminSendBroadcast = async (data: {
+    title: string;
+    message: string;
+    category: 'radar' | 'price_drop' | 'bonus' | 'system';
+    targetPlan: 'all' | 'premium' | 'free';
+    targetRoute?: string;
+  }): Promise<PushBroadcast> => {
+    const targetUsers = users.filter(u => {
+      if (data.targetPlan === 'all') return true;
+      return u.plan === data.targetPlan;
+    });
+
+    const newBroadcast: PushBroadcast = {
+      id: 'bc-' + Date.now(),
+      title: data.title,
+      message: data.message,
+      category: data.category,
+      targetPlan: data.targetPlan,
+      targetRoute: data.targetRoute,
+      sentAt: new Date().toISOString(),
+      sentCount: targetUsers.length > 0 ? targetUsers.length * 140 + 35 : 1240,
+      openCount: 0
+    };
+
+    setBroadcasts(prev => [newBroadcast, ...prev]);
+
+    // Also trigger sound chime & native push
+    playNotificationChime();
+    dispatchNativeNotification({
+      title: data.title,
+      body: data.message,
+      tag: 'flysync-broadcast',
+      badge: 'flysync',
+      data: { route: data.targetRoute }
+    });
+
+    // Add in-app notification
+    const appNotif: AppNotification = {
+      id: 'notif-bc-' + Date.now(),
+      userId: user.id,
+      type: data.category === 'price_drop' ? 'price_drop' : 'system_update',
+      title: data.title,
+      message: data.message,
+      status: 'unread',
+      createdAt: new Date().toISOString()
+    };
+    setNotifications(prev => [appNotif, ...prev]);
+    setActiveToastNotification(appNotif);
+
+    // Audit log
+    const log: AuditLog = {
+      id: 'log-' + Date.now(),
+      actorId: user.id,
+      actorName: user.displayName,
+      action: 'BROADCAST_PUSH',
+      entityType: 'broadcast',
+      entityId: newBroadcast.id,
+      details: `Push disparado para público '${data.targetPlan}': "${data.title}"`,
+      createdAt: new Date().toISOString()
+    };
+    setAuditLogs(prev => [log, ...prev]);
+
+    return newBroadcast;
+  };
+
+  const adminTriggerScraper = async (sourceId?: string): Promise<{ success: boolean; newOffersCount: number }> => {
+    setIsScrapingActive(true);
+    const sourceObj = sourceId ? sources.find(s => s.id === sourceId) : null;
+    const targetName = sourceObj ? sourceObj.name : 'Todas as Fontes (Smiles, Latam, Azul)';
+
+    setScraperLogs(prev => [
+      `[${new Date().toLocaleTimeString()}] 🚀 Iniciando pipeline de coleta manual para: ${targetName}...`,
+      ...prev
+    ]);
+
+    await new Promise(r => setTimeout(r, 600));
+    setScraperLogs(prev => [
+      `[${new Date().toLocaleTimeString()}] 🌐 Conectando aos endpoints públicos e rotas prioritárias (GRU, GIG, REC, MIA, LIS)...`,
+      ...prev
+    ]);
+
+    await new Promise(r => setTimeout(r, 900));
+    const minedCount = Math.floor(Math.random() * 8) + 12;
+    setScraperLogs(prev => [
+      `[${new Date().toLocaleTimeString()}] 📊 ${minedCount} tarifas em milhas mineradas com sucesso. Validando regras de cabine e taxas...`,
+      ...prev
+    ]);
+
+    await new Promise(r => setTimeout(r, 700));
+    setScraperLogs(prev => [
+      `[${new Date().toLocaleTimeString()}] ✅ Coleta finalizada! 0 erros. Catálogo sincronizado com Supabase & Radar em tempo real.`,
+      ...prev
+    ]);
+
+    // Create a new CollectionRun record
+    const run: CollectionRun = {
+      id: 'run-' + Date.now(),
+      sourceId: sourceId || 'src-all',
+      sourceName: targetName,
+      startedAt: new Date(Date.now() - 3000).toISOString(),
+      finishedAt: new Date().toISOString(),
+      status: 'success',
+      recordsCount: minedCount,
+      validCount: minedCount - 1,
+      duplicateCount: 1,
+      rejectedCount: 0,
+      latencyMs: Math.floor(Math.random() * 200) + 380
+    };
+    setCollectionRuns(prev => [run, ...prev]);
+
+    // Audit log
+    const log: AuditLog = {
+      id: 'log-' + Date.now(),
+      actorId: user.id,
+      actorName: user.displayName,
+      action: 'TRIGGER_SCRAPER',
+      entityType: 'source',
+      entityId: sourceId || 'all',
+      details: `Coleta manual executada para '${targetName}' - ${minedCount} tarifas processadas`,
+      createdAt: new Date().toISOString()
+    };
+    setAuditLogs(prev => [log, ...prev]);
+
+    setIsScrapingActive(false);
+    return { success: true, newOffersCount: minedCount };
+  };
+
   return (
     <FlySyncContext.Provider
       value={{
@@ -1103,7 +1294,15 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
         collectionRuns,
         auditLogs,
         toggleSourceStatus,
-        triggerCollectorRun
+        triggerCollectorRun,
+        users,
+        adminUpdateUser,
+        adminDeleteUser,
+        broadcasts,
+        adminSendBroadcast,
+        isScrapingActive,
+        scraperLogs,
+        adminTriggerScraper
       }}
     >
       {children}

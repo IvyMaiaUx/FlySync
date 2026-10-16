@@ -24,10 +24,17 @@ import {
   ExternalLink,
   ChevronRight,
   Plane,
-  Radar
+  Radar,
+  TrendingUp,
+  BellRing,
+  Server
 } from 'lucide-react';
 import { CabinClass, OfferAvailabilityStatus, FlightOffer } from '../../types';
 import { FlySyncLogo } from '../common/FlySyncLogo';
+import { AdminAnalyticsTab } from './AdminAnalyticsTab';
+import { AdminUsersTab } from './AdminUsersTab';
+import { AdminBroadcastTab } from './AdminBroadcastTab';
+import { AdminScrapersTab } from './AdminScrapersTab';
 
 interface AdminPortalProps {
   onBackToApp: () => void;
@@ -46,11 +53,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
     auditLogs,
     toggleSourceStatus,
     adminCreateOffer,
-    adminUpdateOfferStatus
+    adminUpdateOfferStatus,
+    users,
+    broadcasts,
+    isScrapingActive
   } = useFlySync();
 
   // Navigation tab
-  const [activeTab, setActiveTab] = useState<'offers' | 'sources' | 'runs' | 'logs' | 'scraper_guide'>('offers');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'broadcast' | 'scrapers' | 'offers' | 'sources' | 'runs' | 'logs' | 'scraper_guide'>('analytics');
 
   // Login form state for unauthenticated or non-admin users
   const [adminEmail, setAdminEmail] = useState('maia.operacional@gmail.com');
@@ -366,41 +376,90 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-purple-900/60">
           <div className="flex items-center gap-1.5 p-1 bg-[#12052C] border border-purple-900/80 rounded-xl overflow-x-auto text-xs">
             <button
+              onClick={() => setActiveTab('analytics')}
+              className={`px-3.5 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                activeTab === 'analytics'
+                  ? 'bg-amber-400 text-slate-950 shadow-md font-black'
+                  : 'text-purple-300 hover:text-white hover:bg-purple-900/40'
+              }`}
+            >
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span>Métricas & BI</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('users')}
+              className={`px-3.5 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                activeTab === 'users'
+                  ? 'bg-amber-400 text-slate-950 shadow-md font-black'
+                  : 'text-purple-300 hover:text-white hover:bg-purple-900/40'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>Usuários & VIP ({users.length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('broadcast')}
+              className={`px-3.5 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                activeTab === 'broadcast'
+                  ? 'bg-amber-400 text-slate-950 shadow-md font-black'
+                  : 'text-purple-300 hover:text-white hover:bg-purple-900/40'
+              }`}
+            >
+              <BellRing className="w-3.5 h-3.5" />
+              <span>Disparar Push</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('scrapers')}
+              className={`px-3.5 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                activeTab === 'scrapers'
+                  ? 'bg-amber-400 text-slate-950 shadow-md font-black'
+                  : 'text-purple-300 hover:text-white hover:bg-purple-900/40'
+              }`}
+            >
+              <Server className="w-3.5 h-3.5" />
+              <span>Controle Scrapers</span>
+              {isScrapingActive && <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />}
+            </button>
+
+            <button
               onClick={() => setActiveTab('offers')}
-              className={`px-4 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${
+              className={`px-3.5 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${
                 activeTab === 'offers'
                   ? 'bg-amber-400 text-slate-950 shadow-md font-black'
                   : 'text-purple-300 hover:text-white hover:bg-purple-900/40'
               }`}
             >
-              Ofertas & Curadoria ({offers.length})
+              Ofertas ({offers.length})
             </button>
 
             <button
               onClick={() => setActiveTab('sources')}
-              className={`px-4 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${
+              className={`px-3.5 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${
                 activeTab === 'sources'
                   ? 'bg-amber-400 text-slate-950 shadow-md font-black'
                   : 'text-purple-300 hover:text-white hover:bg-purple-900/40'
               }`}
             >
-              Fontes de Dados ({sources.length})
+              Fontes ({sources.length})
             </button>
 
             <button
               onClick={() => setActiveTab('runs')}
-              className={`px-4 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${
+              className={`px-3.5 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${
                 activeTab === 'runs'
                   ? 'bg-amber-400 text-slate-950 shadow-md font-black'
                   : 'text-purple-300 hover:text-white hover:bg-purple-900/40'
               }`}
             >
-              Execuções de Coleta ({collectionRuns.length})
+              Execuções ({collectionRuns.length})
             </button>
 
             <button
               onClick={() => setActiveTab('logs')}
-              className={`px-4 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${
+              className={`px-3.5 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${
                 activeTab === 'logs'
                   ? 'bg-amber-400 text-slate-950 shadow-md font-black'
                   : 'text-purple-300 hover:text-white hover:bg-purple-900/40'
@@ -411,14 +470,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
 
             <button
               onClick={() => setActiveTab('scraper_guide')}
-              className={`px-4 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all flex items-center gap-1.5 ${
+              className={`px-3.5 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all flex items-center gap-1.5 ${
                 activeTab === 'scraper_guide'
                   ? 'bg-emerald-500 text-slate-950 shadow-md font-black'
                   : 'text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10'
               }`}
             >
               <FileCode className="w-3.5 h-3.5" />
-              <span>Integração do Scraper</span>
+              <span>Guia Scrapers</span>
             </button>
           </div>
 
@@ -430,6 +489,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
             <span>Cadastrar Oferta Manualmente</span>
           </button>
         </div>
+
+        {/* Tab: Analytics & BI */}
+        {activeTab === 'analytics' && <AdminAnalyticsTab />}
+
+        {/* Tab: Users & Subscriptions Management */}
+        {activeTab === 'users' && <AdminUsersTab />}
+
+        {/* Tab: Push Broadcast & Alert Dispatcher */}
+        {activeTab === 'broadcast' && <AdminBroadcastTab />}
+
+        {/* Tab: Scrapers Live Control */}
+        {activeTab === 'scrapers' && <AdminScrapersTab />}
 
         {/* Tab 1: Offers Moderation */}
         {activeTab === 'offers' && (

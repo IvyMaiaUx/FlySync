@@ -11,7 +11,8 @@ import {
   Plan,
   PartnerCampaign,
   AuditLog,
-  UserProfile
+  UserProfile,
+  PushBroadcast
 } from '../types';
 import scrapedOffersData from './scrapedOffers.json';
 
@@ -39,6 +40,261 @@ export const INITIAL_USER: UserProfile = {
     phone: '(11) 98765-4321'
   }
 };
+
+export const INITIAL_USERS: UserProfile[] = [
+  INITIAL_USER,
+  {
+    id: 'usr-002',
+    displayName: 'Isabelle F.',
+    email: 'isabelle021004@gmail.com',
+    role: 'admin',
+    plan: 'premium',
+    createdAt: '2026-08-18T14:20:00Z',
+    preferences: {
+      emailAlerts: true,
+      whatsappAlerts: true,
+      inAppAlerts: true,
+      pushAlerts: true,
+      soundEnabled: true,
+      frequency: 'immediate',
+      termsAccepted: true,
+      privacyAccepted: true,
+      termsAcceptedAt: '2026-08-18T14:20:00Z',
+      preferredOrigin: 'GIG',
+      preferredCabin: 'business',
+      favoriteDestinations: ['LIS', 'MAD', 'CDG', 'MIA'],
+      favoriteOrigins: ['GIG', 'GRU'],
+      phone: '(21) 99876-5432'
+    }
+  },
+  {
+    id: 'usr-003',
+    displayName: 'Lucas Albuquerque',
+    email: 'lucas.albuquerque@gmail.com',
+    role: 'user',
+    plan: 'premium',
+    createdAt: '2026-09-01T09:15:00Z',
+    preferences: {
+      emailAlerts: true,
+      whatsappAlerts: true,
+      inAppAlerts: true,
+      pushAlerts: true,
+      soundEnabled: true,
+      frequency: 'immediate',
+      termsAccepted: true,
+      privacyAccepted: true,
+      termsAcceptedAt: '2026-09-01T09:15:00Z',
+      preferredOrigin: 'BSB',
+      preferredCabin: 'economy',
+      favoriteDestinations: ['MIA', 'MCO', 'EZE'],
+      favoriteOrigins: ['BSB', 'CNF'],
+      phone: '(61) 98112-3344'
+    }
+  },
+  {
+    id: 'usr-004',
+    displayName: 'Mariana Costa',
+    email: 'mariana.costa@uol.com.br',
+    role: 'user',
+    plan: 'premium',
+    createdAt: '2026-09-10T16:40:00Z',
+    preferences: {
+      emailAlerts: true,
+      whatsappAlerts: true,
+      inAppAlerts: true,
+      pushAlerts: true,
+      soundEnabled: true,
+      frequency: 'immediate',
+      termsAccepted: true,
+      privacyAccepted: true,
+      termsAcceptedAt: '2026-09-10T16:40:00Z',
+      preferredOrigin: 'GRU',
+      preferredCabin: 'business',
+      favoriteDestinations: ['MAD', 'FCO', 'JFK', 'NRT'],
+      favoriteOrigins: ['GRU'],
+      phone: '(11) 97654-1234'
+    }
+  },
+  {
+    id: 'usr-005',
+    displayName: 'Rodrigo Silveira',
+    email: 'rodrigo.silveira@hotmail.com',
+    role: 'user',
+    plan: 'free',
+    createdAt: '2026-09-15T11:00:00Z',
+    preferences: {
+      emailAlerts: true,
+      whatsappAlerts: false,
+      inAppAlerts: true,
+      pushAlerts: false,
+      soundEnabled: false,
+      frequency: 'daily',
+      termsAccepted: true,
+      privacyAccepted: true,
+      termsAcceptedAt: '2026-09-15T11:00:00Z',
+      preferredOrigin: 'CNF',
+      preferredCabin: 'economy',
+      favoriteDestinations: ['REC', 'SSA'],
+      favoriteOrigins: ['CNF'],
+      phone: '(31) 99123-4567'
+    }
+  },
+  {
+    id: 'usr-006',
+    displayName: 'Camila Mendes',
+    email: 'camila.mendes@gmail.com',
+    role: 'user',
+    plan: 'premium',
+    createdAt: '2026-09-22T18:30:00Z',
+    preferences: {
+      emailAlerts: true,
+      whatsappAlerts: true,
+      inAppAlerts: true,
+      pushAlerts: true,
+      soundEnabled: true,
+      frequency: 'immediate',
+      termsAccepted: true,
+      privacyAccepted: true,
+      termsAcceptedAt: '2026-09-22T18:30:00Z',
+      preferredOrigin: 'REC',
+      preferredCabin: 'economy',
+      favoriteDestinations: ['LIS', 'GRU', 'FOR', 'NAT'],
+      favoriteOrigins: ['REC'],
+      phone: '(81) 98777-6655'
+    }
+  },
+  {
+    id: 'usr-007',
+    displayName: 'Felipe Santana',
+    email: 'felipe.santana@outlook.com',
+    role: 'user',
+    plan: 'free',
+    createdAt: '2026-09-28T13:10:00Z',
+    preferences: {
+      emailAlerts: false,
+      whatsappAlerts: false,
+      inAppAlerts: true,
+      pushAlerts: false,
+      soundEnabled: false,
+      frequency: 'weekly',
+      termsAccepted: true,
+      privacyAccepted: true,
+      termsAcceptedAt: '2026-09-28T13:10:00Z',
+      preferredOrigin: 'SSA',
+      preferredCabin: 'economy',
+      favoriteDestinations: ['GRU'],
+      favoriteOrigins: ['SSA'],
+      phone: '(71) 99345-6789'
+    }
+  },
+  {
+    id: 'usr-008',
+    displayName: 'Beatriz Vasconcelos',
+    email: 'beatriz.v@gmail.com',
+    role: 'user',
+    plan: 'premium',
+    createdAt: '2026-10-02T10:00:00Z',
+    preferences: {
+      emailAlerts: true,
+      whatsappAlerts: true,
+      inAppAlerts: true,
+      pushAlerts: true,
+      soundEnabled: true,
+      frequency: 'immediate',
+      termsAccepted: true,
+      privacyAccepted: true,
+      termsAcceptedAt: '2026-10-02T10:00:00Z',
+      preferredOrigin: 'POA',
+      preferredCabin: 'business',
+      favoriteDestinations: ['SCL', 'EZE', 'MIA', 'MAD'],
+      favoriteOrigins: ['POA', 'GRU'],
+      phone: '(51) 98888-2233'
+    }
+  },
+  {
+    id: 'usr-009',
+    displayName: 'Gustavo Pinheiro',
+    email: 'gustavo.pinheiro@yahoo.com.br',
+    role: 'user',
+    plan: 'free',
+    createdAt: '2026-10-05T14:45:00Z',
+    preferences: {
+      emailAlerts: true,
+      whatsappAlerts: false,
+      inAppAlerts: true,
+      pushAlerts: false,
+      soundEnabled: false,
+      frequency: 'daily',
+      termsAccepted: true,
+      privacyAccepted: true,
+      termsAcceptedAt: '2026-10-05T14:45:00Z',
+      preferredOrigin: 'FLN',
+      preferredCabin: 'economy',
+      favoriteDestinations: ['GRU', 'GIG'],
+      favoriteOrigins: ['FLN'],
+      phone: '(48) 99111-4455'
+    }
+  },
+  {
+    id: 'usr-010',
+    displayName: 'Juliana Ribeiro',
+    email: 'juliana.ribeiro@empresa.com.br',
+    role: 'user',
+    plan: 'premium',
+    createdAt: '2026-10-10T17:20:00Z',
+    preferences: {
+      emailAlerts: true,
+      whatsappAlerts: true,
+      inAppAlerts: true,
+      pushAlerts: true,
+      soundEnabled: true,
+      frequency: 'immediate',
+      termsAccepted: true,
+      privacyAccepted: true,
+      termsAcceptedAt: '2026-10-10T17:20:00Z',
+      preferredOrigin: 'FOR',
+      preferredCabin: 'economy',
+      favoriteDestinations: ['MIA', 'LIS', 'REC'],
+      favoriteOrigins: ['FOR'],
+      phone: '(85) 98666-3322'
+    }
+  }
+];
+
+export const INITIAL_BROADCASTS: PushBroadcast[] = [
+  {
+    id: 'bc-1',
+    title: '🔥 Bug Tarifa: Miami por 38.000 milhas Smiles!',
+    message: 'Encontramos emissões promocionais saindo de GRU para MIA em voos diretos da GOL/American. Vagas limitadas!',
+    category: 'price_drop',
+    targetPlan: 'all',
+    targetRoute: 'GRU → MIA',
+    sentAt: '2026-10-14T15:30:00Z',
+    sentCount: 1420,
+    openCount: 894
+  },
+  {
+    id: 'bc-2',
+    title: '✈️ Executiva TAP para Lisboa por 89.000 milhas',
+    message: 'Disponibilidade de classe executiva em dias de baixa temporada pelo TAP Miles&Go com taxas reduzidas.',
+    category: 'radar',
+    targetPlan: 'premium',
+    targetRoute: 'GRU → LIS',
+    sentAt: '2026-10-12T11:00:00Z',
+    sentCount: 680,
+    openCount: 512
+  },
+  {
+    id: 'bc-3',
+    title: '🎁 Bônus Livelo: até 100% de transferência para Azul',
+    message: 'Campanha relâmpago de transferência bonificada válida somente até às 23h59 de hoje.',
+    category: 'bonus',
+    targetPlan: 'all',
+    sentAt: '2026-10-09T08:00:00Z',
+    sentCount: 1890,
+    openCount: 1240
+  }
+];
 
 export const INITIAL_PROGRAMS: LoyaltyProgram[] = [
   {
