@@ -197,7 +197,7 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
           .from('offers')
           .select('*')
           .gte('departure_date', todayStr)
-          .order('departure_date', { ascending: true })
+          .order('verified_at', { ascending: false })
           .limit(1000),
         supabase.from('offer_observations').select('*').order('observed_at', { ascending: true }).limit(500)
       ]);
@@ -318,6 +318,15 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
       authListener.subscription.unsubscribe();
     };
   }, [fetchPublicData, fetchUserData]);
+
+  // Sincronização periódica em background de novas promoções (a cada 3 minutos)
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    const interval = setInterval(() => {
+      fetchPublicData();
+    }, 180000);
+    return () => clearInterval(interval);
+  }, [fetchPublicData]);
 
   // Realtime Supabase: Novas ofertas e notificações chegam sem recarregar
   useEffect(() => {
