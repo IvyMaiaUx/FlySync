@@ -92,12 +92,7 @@ const MainApp: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0C021E] text-slate-100 flex flex-col font-sans selection:bg-[#22C55E] selection:text-slate-950 relative overflow-x-hidden">
-      {/* Ambient Cosmic Starlight Glows mirroring the official Logo */}
-      <div className="fixed top-0 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="fixed top-20 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="fixed top-60 left-1/3 w-80 h-80 bg-emerald-500/8 rounded-full blur-3xl pointer-events-none -z-10" />
-
+    <div className="min-h-screen bg-[#08060f] text-slate-100 flex flex-col font-sans selection:bg-[#34d399] selection:text-slate-950 relative overflow-x-hidden">
       {/* Top Header do Aplicativo do Usuário */}
       <Header
         currentTab={currentTab}

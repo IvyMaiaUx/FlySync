@@ -1,7 +1,7 @@
 import { calculateRouteTrendInsights } from '../../utils/trendPrediction';
 import { evaluateDeal } from '../../utils/thermometer';
 import { analyzeOfferEconomilha } from '../../utils/economilha';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useFlySync } from '../../store/FlySyncContext';
 import { OfferDetailModal } from './OfferDetailModal';
 import { RouteCalendarModal } from './RouteCalendarModal';
@@ -69,6 +69,11 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
 
   // View Mode: 'cards' (individual offers) or 'routes' (grouped multi-month routes)
   const [viewMode, setViewMode] = useState<'cards' | 'routes'>('routes');
+
+  // Progressive rendering / pagination (solves desktop scroll lag)
+  const PAGE_SIZE = 24;
+  const [visibleRoutesCount, setVisibleRoutesCount] = useState<number>(PAGE_SIZE);
+  const [visibleOffersCount, setVisibleOffersCount] = useState<number>(PAGE_SIZE);
 
   // Calendar Modal State
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -282,10 +287,38 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
     });
   }, [filteredOffers, paymentMode]);
 
-  // Count available offers for a specific route
-  const getRouteOfferCount = (origin: string, dest: string) => {
+  // Reset pagination when any filter changes
+  useEffect(() => {
+    setVisibleRoutesCount(PAGE_SIZE);
+    setVisibleOffersCount(PAGE_SIZE);
+  }, [originSearch, destSearch, selectedProgram, cabinClass, tripType, maxMiles, selectedMonth, paymentMode, sortBy]);
+
+  // Sliced arrays for smooth rendering without DOM overload
+  const displayedRoutes = useMemo(() => {
+    return groupedRoutes.slice(0, visibleRoutesCount);
+  }, [groupedRoutes, visibleRoutesCount]);
+
+  const displayedOffers = useMemo(() => {
+    return filteredOffers.slice(0, visibleOffersCount);
+  }, [filteredOffers, visibleOffersCount]);
+
+  // Precomputed route offer counts map for O(1) instant access instead of O(N) array filtering per card
+  const routeCountsMap = useMemo(() => {
     const todayStr = new Date().toISOString().split('T')[0];
-    return offers.filter(o => o.origin === origin && o.destination === dest && o.status === 'ativa' && o.departureDate >= todayStr).length;
+    const map = new Map<string, number>();
+    for (let i = 0; i < offers.length; i++) {
+      const o = offers[i];
+      if (o.status === 'ativa' && o.departureDate >= todayStr) {
+        const key = `${o.origin}_${o.destination}`;
+        map.set(key, (map.get(key) || 0) + 1);
+      }
+    }
+    return map;
+  }, [offers]);
+
+  // Count available offers for a specific route (O(1))
+  const getRouteOfferCount = (origin: string, dest: string) => {
+    return routeCountsMap.get(`${origin}_${dest}`) || 0;
   };
 
   const formatDate = (dateStr: string) => {
@@ -640,9 +673,9 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
       <div className="flex items-center justify-between text-xs text-slate-400 px-1">
         <span>
           {viewMode === 'routes' ? (
-            <>Exibindo <strong className="text-white tabular-nums">{groupedRoutes.length}</strong> rotas agrupadas com múltiplas datas</>
+            <>Exibindo <strong className="text-white tabular-nums">{displayedRoutes.length}</strong> de <strong className="text-white tabular-nums">{groupedRoutes.length}</strong> rotas agrupadas</>
           ) : (
-            <>Exibindo <strong className="text-white tabular-nums">{filteredOffers.length}</strong> oportunidades verificadas</>
+            <>Exibindo <strong className="text-white tabular-nums">{displayedOffers.length}</strong> de <strong className="text-white tabular-nums">{filteredOffers.length}</strong> oportunidades</>
           )}
         </span>
         <span className="text-[#38BDF8]">Atualizações automáticas de radar</span>
@@ -667,7 +700,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {groupedRoutes.map(group => {
+              {displayedRoutes.map(group => {
                 const prog = programs.find(p => p.id === group.programId);
                 const totalDates = group.offers.length;
 
@@ -905,6 +938,29 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
               })}
             </div>
           )}
+
+          {/* Load More Button for Routes */}
+          {visibleRoutesCount < groupedRoutes.length && (
+            <div className="pt-4 pb-2 text-center flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setVisibleRoutesCount(prev => prev + PAGE_SIZE)}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs font-bold bg-purple-900/50 hover:bg-purple-900/80 text-white border border-purple-700/60 hover:border-purple-500 transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span>Carregar mais rotas (+24)</span>
+                <span className="text-[11px] text-purple-300 tabular-nums">
+                  ({displayedRoutes.length} de {groupedRoutes.length})
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setVisibleRoutesCount(groupedRoutes.length)}
+                className="text-xs text-slate-400 hover:text-white transition-colors underline cursor-pointer"
+              >
+                Exibir todas ({groupedRoutes.length})
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -927,7 +983,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredOffers.map((offer) => {
+              {displayedOffers.map((offer) => {
                 const prog = programs.find(p => p.id === offer.programId);
                 const isExecutiva = offer.cabinClass === 'business';
                 const totalRouteDates = getRouteOfferCount(offer.origin, offer.destination);
@@ -1190,6 +1246,29 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {/* Load More Button for Individual Offers */}
+          {visibleOffersCount < filteredOffers.length && (
+            <div className="pt-4 pb-2 text-center flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setVisibleOffersCount(prev => prev + PAGE_SIZE)}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs font-bold bg-purple-900/50 hover:bg-purple-900/80 text-white border border-purple-700/60 hover:border-purple-500 transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span>Carregar mais oportunidades (+24)</span>
+                <span className="text-[11px] text-purple-300 tabular-nums">
+                  ({displayedOffers.length} de {filteredOffers.length})
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setVisibleOffersCount(filteredOffers.length)}
+                className="text-xs text-slate-400 hover:text-white transition-colors underline cursor-pointer"
+              >
+                Exibir todas ({filteredOffers.length})
+              </button>
             </div>
           )}
         </>

@@ -35,12 +35,11 @@
   body {
     font-family: var(--font-sans);
     color: #f5f4fa;
-    background: radial-gradient(900px 520px at 12% -10%, rgba(110,80,235,.26), transparent 62%),
-                radial-gradient(700px 520px at 105% 8%, rgba(52,211,153,.09), transparent 60%),
-                #08060f;
-    background-attachment: fixed;
+    background-color: #08060f;
+    background-image: radial-gradient(900px 520px at 12% -10%, rgba(110,80,235,.22), transparent 62%),
+                      radial-gradient(700px 520px at 105% 8%, rgba(52,211,153,.08), transparent 60%);
+    background-repeat: no-repeat;
     -webkit-font-smoothing: antialiased;
-    scroll-behavior: smooth;
     letter-spacing: -0.005em;
   }
 
