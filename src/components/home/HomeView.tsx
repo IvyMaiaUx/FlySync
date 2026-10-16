@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { useFlySync } from '../../store/FlySyncContext';
 import { FlightOffer } from '../../types';
-import { Search, Calculator, Bell, Wallet, Sparkles, Plane, ArrowRight, Tag, Flame, Info, ChevronRight } from 'lucide-react';
+import { Search, Calculator, Bell, Wallet, Sparkles, Plane, ArrowRight, Tag, Flame, Info, ChevronRight, MapPin } from 'lucide-react';
+import { getDestinationImageUrl } from '../../data/destinationImages';
 
 interface HomeViewProps {
   onNavigate: (tab: string) => void;
@@ -49,11 +50,29 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onSelectOffer })
     ];
   }, [balances, programs, totalBalance]);
 
-  // Featured top offers for "Ofertas de hoje"
+  // Featured top offers for "Ofertas de hoje" with high-appeal destinations (Miami, Santiago, Lisboa, Paris, Buenos Aires, Orlando, Bariloche, etc.)
   const todayOffers = useMemo(() => {
     const todayStr = new Date().toISOString().split('T')[0];
     const valid = offers.filter(o => o.status === 'ativa' && o.departureDate >= todayStr);
-    return valid.slice(0, 6);
+    
+    const highlightDests = ['MIA', 'SCL', 'LIS', 'EZE', 'CDG', 'MCO', 'MAD', 'CUN', 'BRC', 'GIG', 'REC', 'SSA', 'JFK', 'DXB'];
+    const highlighted = valid.filter(o => highlightDests.includes(o.destination.toUpperCase()));
+    const others = valid.filter(o => !highlightDests.includes(o.destination.toUpperCase()));
+    
+    // Pick unique destination pairs to avoid duplicates in the top carousel
+    const seenRoutes = new Set<string>();
+    const uniqueList: FlightOffer[] = [];
+    
+    for (const off of [...highlighted, ...others]) {
+      const key = `${off.origin}-${off.destination}`;
+      if (!seenRoutes.has(key)) {
+        seenRoutes.add(key);
+        uniqueList.push(off);
+      }
+      if (uniqueList.length >= 10) break;
+    }
+    
+    return uniqueList;
   }, [offers]);
 
   // Featured active campaign
@@ -252,29 +271,34 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onSelectOffer })
                 onClick={() => onSelectOffer(offer)}
                 className="flex-none w-[170px] sm:w-[190px] snap-start rounded-[20px] bg-[#110d1d] border border-white/8 hover:border-white/20 transition-all text-left overflow-hidden group cursor-pointer hover:-translate-y-1 shadow-md"
               >
-                {/* Visual Header */}
-                <div
-                  className="relative h-32 p-3 flex flex-col justify-end overflow-hidden"
-                  style={{ background: bgGrad }}
-                >
-                  {/* Decorative circle */}
-                  <div className="absolute -top-7 -right-7 w-24 h-24 rounded-full bg-white/5 pointer-events-none" />
+                {/* Visual Header with Real Destination Photography */}
+                <div className="relative h-36 p-3 flex flex-col justify-end overflow-hidden group/img">
+                  <img
+                    src={getDestinationImageUrl(offer.destination, offer.destCity)}
+                    alt={offer.destCity}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  {/* Dark gradient overlay for text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#110d1d] via-[#110d1d]/40 to-black/30 pointer-events-none" />
 
                   {/* Top Badges */}
-                  <span className="absolute top-2.5 left-2.5 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-black/60 text-slate-200">
-                    {isCash ? 'Dinheiro' : 'Piso'}
+                  <span className="absolute top-2.5 left-2.5 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-slate-100 border border-white/10 shadow-sm z-10">
+                    {isCash ? '💵 Dinheiro' : '✈️ Milhas'}
                   </span>
 
-                  <span className="absolute top-2.5 right-2.5 text-[9px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-[#3ee6a8] to-[#86efac] text-[#08060f]">
+                  <span className="absolute top-2.5 right-2.5 text-[9px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-[#3ee6a8] to-[#86efac] text-[#08060f] shadow-sm z-10">
                     OFERTA
                   </span>
 
-                  <strong className="text-lg font-black tracking-tight text-white block">
-                    {offer.origin} → {offer.destination}
-                  </strong>
-                  <span className="text-[11px] text-white/80 truncate block">
-                    {offer.destCity}
-                  </span>
+                  <div className="relative z-10">
+                    <strong className="text-lg font-black tracking-tight text-white block drop-shadow-md">
+                      {offer.origin} → {offer.destination}
+                    </strong>
+                    <span className="text-[11px] text-slate-200 font-medium truncate block drop-shadow-sm">
+                      {offer.destCity}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Price Info */}

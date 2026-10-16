@@ -18,6 +18,7 @@ import {
   ExternalLink,
   ShieldCheck
 } from 'lucide-react';
+import { getDestinationImageUrl } from '../../data/destinationImages';
 
 interface ProfileViewProps {
   onNavigate: (tab: string) => void;
@@ -184,10 +185,21 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onOpenUpgr
               className="flex items-center justify-between p-3.5 rounded-2xl bg-[#110d1d] border border-white/8 hover:border-white/15 transition-all"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#181328] border border-white/10 flex items-center justify-center text-[#34d399] font-bold text-sm font-mono">
-                  {code}
+                <div className="w-11 h-11 rounded-xl overflow-hidden relative shrink-0 border border-white/10 shadow-sm">
+                  <img
+                    src={getDestinationImageUrl(code)}
+                    alt={code}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-mono font-black text-xs">
+                    {code}
+                  </div>
                 </div>
-                <span className="text-sm font-bold text-white">Aeroporto {code}</span>
+                <div>
+                  <span className="text-sm font-bold text-white block">Aeroporto {code}</span>
+                  <span className="text-[11px] text-[#9d98b0] block">Toque para ver no radar</span>
+                </div>
               </div>
               <button
                 type="button"
