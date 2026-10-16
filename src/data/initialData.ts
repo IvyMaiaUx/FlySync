@@ -31,7 +31,12 @@ export const INITIAL_USER: UserProfile = {
     frequency: 'immediate',
     termsAccepted: true,
     privacyAccepted: true,
-    termsAcceptedAt: '2026-08-15T10:05:00Z'
+    termsAcceptedAt: '2026-08-15T10:05:00Z',
+    preferredOrigin: 'GRU',
+    preferredCabin: 'economy',
+    favoriteDestinations: ['MIA', 'LIS', 'MAD', 'REC', 'SCL'],
+    favoriteOrigins: ['GRU', 'GIG', 'CNF'],
+    phone: '(11) 98765-4321'
   }
 };
 

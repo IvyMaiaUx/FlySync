@@ -19,6 +19,11 @@ export interface UserProfile {
     termsAccepted: boolean;
     privacyAccepted: boolean;
     termsAcceptedAt: string;
+    preferredOrigin?: string;
+    preferredCabin?: 'economy' | 'premium_economy' | 'business';
+    favoriteDestinations?: string[];
+    favoriteOrigins?: string[];
+    phone?: string;
   };
 }
 

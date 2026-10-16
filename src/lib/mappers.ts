@@ -32,7 +32,12 @@ export const DEFAULT_PREFERENCES: UserProfile['preferences'] = {
   frequency: 'immediate',
   termsAccepted: true,
   privacyAccepted: true,
-  termsAcceptedAt: new Date().toISOString()
+  termsAcceptedAt: new Date().toISOString(),
+  preferredOrigin: 'GRU',
+  preferredCabin: 'economy',
+  favoriteDestinations: ['MIA', 'LIS', 'MAD', 'REC', 'SCL'],
+  favoriteOrigins: ['GRU', 'GIG', 'CNF'],
+  phone: '(11) 98765-4321'
 };
 
 export const toProfile = (r: Row): UserProfile => ({

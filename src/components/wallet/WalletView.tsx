@@ -22,7 +22,11 @@ import {
   Lightbulb
 } from 'lucide-react';
 
-export const WalletView: React.FC = () => {
+interface WalletViewProps {
+  onNavigate?: (tab: string) => void;
+}
+
+export const WalletView: React.FC<WalletViewProps> = ({ onNavigate }) => {
   const {
     balances,
     programs,
@@ -394,7 +398,7 @@ export const WalletView: React.FC = () => {
 
       {/* Expert Optimization Tips & Transfer Simulator */}
       <div id="expert-tips" className="pt-2">
-        <ExpertTips />
+        <ExpertTips onNavigate={onNavigate} />
       </div>
 
       {/* 12-Month Accumulation Trends Line Chart */}

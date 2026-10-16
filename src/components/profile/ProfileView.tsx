@@ -35,27 +35,41 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onOpenUpgr
   // Account form state
   const [name, setName] = useState<string>(user.displayName || 'Ivy Maia');
   const [email, setEmail] = useState<string>(user.email || 'ivy@flysync.app');
-  const [phone, setPhone] = useState<string>('(11) 98765-4321');
-  const [preferredOrigin, setPreferredOrigin] = useState<string>('GRU');
-  const [preferredCabin, setPreferredCabin] = useState<'Econômica' | 'Executiva'>('Econômica');
+  const [phone, setPhone] = useState<string>(user.preferences.phone || '(11) 98765-4321');
+  const [preferredOrigin, setPreferredOrigin] = useState<string>(user.preferences.preferredOrigin || 'GRU');
+  const [preferredCabin, setPreferredCabin] = useState<'Econômica' | 'Executiva'>(
+    user.preferences.preferredCabin === 'business' ? 'Executiva' : 'Econômica'
+  );
   const [savedSuccess, setSavedSuccess] = useState<boolean>(false);
 
   // Favorites state
   const [favType, setFavType] = useState<'d' | 'o'>('d');
   const [newFavAirport, setNewFavAirport] = useState<string>('');
-  const [favoriteDestinations, setFavoriteDestinations] = useState<string[]>(['REC', 'MAD', 'MIA', 'LIS']);
-  const [favoriteOrigins, setFavoriteOrigins] = useState<string[]>(['GRU', 'GIG', 'CNF']);
+  const [favoriteDestinations, setFavoriteDestinations] = useState<string[]>(
+    user.preferences.favoriteDestinations && user.preferences.favoriteDestinations.length > 0
+      ? user.preferences.favoriteDestinations
+      : ['REC', 'MAD', 'MIA', 'LIS']
+  );
+  const [favoriteOrigins, setFavoriteOrigins] = useState<string[]>(
+    user.preferences.favoriteOrigins && user.preferences.favoriteOrigins.length > 0
+      ? user.preferences.favoriteOrigins
+      : ['GRU', 'GIG', 'CNF']
+  );
 
   const handleAddFavorite = () => {
     const code = newFavAirport.trim().toUpperCase();
     if (!code) return;
     if (favType === 'd') {
       if (!favoriteDestinations.includes(code)) {
-        setFavoriteDestinations([...favoriteDestinations, code]);
+        const next = [...favoriteDestinations, code];
+        setFavoriteDestinations(next);
+        updateUserPreferences({ favoriteDestinations: next });
       }
     } else {
       if (!favoriteOrigins.includes(code)) {
-        setFavoriteOrigins([...favoriteOrigins, code]);
+        const next = [...favoriteOrigins, code];
+        setFavoriteOrigins(next);
+        updateUserPreferences({ favoriteOrigins: next });
       }
     }
     setNewFavAirport('');
@@ -63,9 +77,13 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onOpenUpgr
 
   const handleRemoveFavorite = (code: string) => {
     if (favType === 'd') {
-      setFavoriteDestinations(favoriteDestinations.filter(c => c !== code));
+      const next = favoriteDestinations.filter(c => c !== code);
+      setFavoriteDestinations(next);
+      updateUserPreferences({ favoriteDestinations: next });
     } else {
-      setFavoriteOrigins(favoriteOrigins.filter(c => c !== code));
+      const next = favoriteOrigins.filter(c => c !== code);
+      setFavoriteOrigins(next);
+      updateUserPreferences({ favoriteOrigins: next });
     }
   };
 
@@ -73,7 +91,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onOpenUpgr
     e.preventDefault();
     updateUserPreferences({
       displayName: name,
-      email
+      email,
+      phone,
+      preferredOrigin,
+      preferredCabin: preferredCabin === 'Executiva' ? 'business' : 'economy',
+      favoriteDestinations,
+      favoriteOrigins
     } as any);
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2500);

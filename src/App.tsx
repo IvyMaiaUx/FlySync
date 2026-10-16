@@ -123,7 +123,7 @@ const MainApp: React.FC = () => {
         {currentTab === 'radar' && (
           <RadarView onOpenCreateAlertForRoute={handleOpenCreateAlertForRoute} />
         )}
-        {currentTab === 'wallet' && <WalletView />}
+        {currentTab === 'wallet' && <WalletView onNavigate={setCurrentTab} />}
         {currentTab === 'alerts' && (
           <AlertsView
             onOpenUpgrade={() => setCurrentTab('subscription')}
