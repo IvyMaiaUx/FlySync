@@ -15,7 +15,9 @@ import {
   ExternalLink,
   Flame,
   Minus,
-  Plus
+  Plus,
+  X,
+  Sparkles
 } from 'lucide-react';
 import { AirportSelect } from '../common/AirportSelect';
 
@@ -67,7 +69,22 @@ export const SearchView: React.FC<SearchViewProps> = ({ onSelectOffer, onOpenCre
   const totalPassengers = adults + children + infants;
   const passengerLabel = `${totalPassengers} ${totalPassengers === 1 ? 'passageiro' : 'passageiros'}`;
 
-  // Month navigation for interactive calendar
+  // Quick preset dates selector (+7d, +15d, +30d, etc.)
+  const handleQuickPresetDates = (days: number) => {
+    const today = new Date();
+    const d = new Date(today);
+    d.setDate(today.getDate() + days);
+    const depStr = d.toISOString().split('T')[0];
+    setDepDate(depStr);
+
+    if (tripType === 'rt') {
+      const r = new Date(d);
+      r.setDate(d.getDate() + 7);
+      setRetDate(r.toISOString().split('T')[0]);
+    }
+  };
+
+  // Month navigation for compact calendar
   const handlePrevMonth = () => {
     setCurrentMonthDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
   };
@@ -77,7 +94,7 @@ export const SearchView: React.FC<SearchViewProps> = ({ onSelectOffer, onOpenCre
 
   const monthLabel = currentMonthDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 
-  // Generate calendar days
+  // Generate calendar days for compact picker (clean, no bloated prices)
   const calendarDays = useMemo(() => {
     const year = currentMonthDate.getFullYear();
     const month = currentMonthDate.getMonth();
@@ -90,19 +107,10 @@ export const SearchView: React.FC<SearchViewProps> = ({ onSelectOffer, onOpenCre
     }
     for (let d = 1; d <= totalDays; d++) {
       const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      // Simulated or real price for this date
-      const basePrice = origin === 'GRU' || destination === 'MAD' ? 45000 : 12900;
-      const dayHash = (d * 7 + (month + 1) * 13) % 9;
-      const price = basePrice + dayHash * 300;
-      days.push({ day: d, dateStr, price });
+      days.push({ day: d, dateStr });
     }
     return days;
-  }, [currentMonthDate, origin, destination]);
-
-  const minMonthPrice = useMemo(() => {
-    const validPrices = calendarDays.filter(Boolean).map(d => d!.price);
-    return validPrices.length > 0 ? Math.min(...validPrices) : 12900;
-  }, [calendarDays]);
+  }, [currentMonthDate]);
 
   // Results matching query
   const matchingOffers = useMemo(() => {
@@ -270,6 +278,26 @@ export const SearchView: React.FC<SearchViewProps> = ({ onSelectOffer, onOpenCre
           </div>
         </div>
 
+        {/* Quick Date Shortcuts Row */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none text-xs -mt-1">
+          <span className="text-[10px] text-slate-400 uppercase font-semibold shrink-0">Datas rápidas:</span>
+          {[
+            { label: '+7 dias', days: 7 },
+            { label: '+15 dias', days: 15 },
+            { label: '+30 dias', days: 30 },
+            { label: '+60 dias', days: 60 }
+          ].map(p => (
+            <button
+              key={p.label}
+              type="button"
+              onClick={() => handleQuickPresetDates(p.days)}
+              className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-[#181328] hover:bg-[#22C55E] hover:text-slate-950 text-slate-300 border border-white/10 shrink-0 cursor-pointer transition-all"
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+
         {/* Passenger Button */}
         <button
           type="button"
@@ -363,78 +391,138 @@ export const SearchView: React.FC<SearchViewProps> = ({ onSelectOffer, onOpenCre
           </div>
         )}
 
-        {/* Interactive Day-by-Day Calendar Picker */}
+        {/* Compact, Clean Floating Date Popover Modal */}
         {calendarTarget && (
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#181328] border border-white/15 space-y-3.5 animate-fade-in shadow-2xl">
-            {/* Month Header Navigation */}
-            <div className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={handlePrevMonth}
-                className="w-8 h-8 rounded-full bg-[#110d1d] border border-white/15 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <strong className="text-sm sm:text-base font-bold text-white capitalize font-sans">
-                {monthLabel} ({calendarTarget === 'dep' ? 'Data de Ida' : 'Data de Volta'})
-              </strong>
-              <button
-                type="button"
-                onClick={handleNextMonth}
-                className="w-8 h-8 rounded-full bg-[#110d1d] border border-white/15 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150">
+            <div className="w-full max-w-sm rounded-2xl bg-[#140628] border border-purple-500/40 p-4 sm:p-5 shadow-2xl space-y-3.5">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-2 border-b border-purple-900/40">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-[#22C55E]" />
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">
+                    {calendarTarget === 'dep' ? 'Data de Ida' : 'Data de Volta'}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCalendarTarget(null)}
+                  className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
 
-            {/* Weekdays */}
-            <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-[#6f6a84]">
-              <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
-            </div>
-
-            {/* Days Grid */}
-            <div className="grid grid-cols-7 gap-1.5">
-              {calendarDays.map((item, idx) => {
-                if (!item) {
-                  return <div key={`empty-${idx}`} className="aspect-[1/1.1]" />;
-                }
-
-                const isSelected = (calendarTarget === 'dep' && item.dateStr === depDate) ||
-                                   (calendarTarget === 'ret' && item.dateStr === retDate);
-                const isLowest = item.price === minMonthPrice;
-
-                return (
+              {/* Quick Preset Date Buttons */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                {[
+                  { label: 'Hoje', days: 0 },
+                  { label: '+7 dias', days: 7 },
+                  { label: '+15 dias', days: 15 },
+                  { label: '+30 dias', days: 30 },
+                  { label: '+60 dias', days: 60 }
+                ].map(p => (
                   <button
-                    key={item.dateStr}
+                    key={p.label}
                     type="button"
                     onClick={() => {
-                      if (calendarTarget === 'dep') {
-                        setDepDate(item.dateStr);
-                      } else {
-                        setRetDate(item.dateStr);
-                      }
+                      const d = new Date();
+                      d.setDate(d.getDate() + p.days);
+                      const str = d.toISOString().split('T')[0];
+                      if (calendarTarget === 'dep') setDepDate(str);
+                      else setRetDate(str);
                       setCalendarTarget(null);
                     }}
-                    className={`aspect-[1/1.1] rounded-xl flex flex-col items-center justify-center gap-0.5 p-1 transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-gradient-to-r from-[#3ee6a8] to-[#2fd08a] text-[#08060f] font-bold shadow-md'
-                        : isLowest
-                        ? 'bg-[#34d399]/15 border border-[#34d399]/40 text-white'
-                        : 'bg-[#110d1d] hover:bg-white/10 text-slate-200 border border-white/5'
-                    }`}
+                    className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#1C0938] hover:bg-[#22C55E] hover:text-slate-950 text-purple-200 border border-purple-700/60 whitespace-nowrap cursor-pointer transition-colors"
                   >
-                    <b className="text-xs font-semibold">{item.day}</b>
-                    <small className={`text-[8.5px] font-mono tabular-nums leading-none ${isSelected ? 'text-[#08060f]' : isLowest ? 'text-[#6ee7b7] font-bold' : 'text-[#6f6a84]'}`}>
-                      {(item.price / 1000).toFixed(1)}k
-                    </small>
+                    {p.label}
                   </button>
-                );
-              })}
-            </div>
+                ))}
+              </div>
 
-            <p className="text-[11px] text-[#9d98b0] text-center pt-1 leading-snug">
-              Milhas estimadas por trecho em cada dia. O <span className="text-[#6ee7b7] font-semibold">menor preço do mês</span> fica destacado em verde.
-            </p>
+              {/* Month Navigation */}
+              <div className="flex items-center justify-between px-1">
+                <button
+                  type="button"
+                  onClick={handlePrevMonth}
+                  className="w-7 h-7 rounded-lg bg-[#180838] border border-purple-800/80 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <strong className="text-xs sm:text-sm font-bold text-white capitalize font-sans">
+                  {monthLabel}
+                </strong>
+                <button
+                  type="button"
+                  onClick={handleNextMonth}
+                  className="w-7 h-7 rounded-lg bg-[#180838] border border-purple-800/80 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Weekdays */}
+              <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400">
+                <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+              </div>
+
+              {/* Clean Days Grid */}
+              <div className="grid grid-cols-7 gap-1">
+                {calendarDays.map((item, idx) => {
+                  if (!item) {
+                    return <div key={`empty-${idx}`} className="h-8" />;
+                  }
+
+                  const todayStr = new Date().toISOString().split('T')[0];
+                  const isPast = item.dateStr < todayStr;
+                  const isSelected = (calendarTarget === 'dep' && item.dateStr === depDate) ||
+                                     (calendarTarget === 'ret' && item.dateStr === retDate);
+
+                  return (
+                    <button
+                      key={item.dateStr}
+                      type="button"
+                      disabled={isPast}
+                      onClick={() => {
+                        if (calendarTarget === 'dep') setDepDate(item.dateStr);
+                        else setRetDate(item.dateStr);
+                        setCalendarTarget(null);
+                      }}
+                      className={`h-8 rounded-lg flex items-center justify-center text-xs font-semibold transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#22C55E] text-slate-950 font-bold shadow-md'
+                          : isPast
+                          ? 'text-slate-600 cursor-not-allowed'
+                          : 'text-slate-200 hover:bg-purple-900/50 hover:text-white'
+                      }`}
+                    >
+                      {item.day}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Native Date Input Picker Option & Close */}
+              <div className="pt-2 border-t border-purple-900/40 flex items-center justify-between gap-2">
+                <input
+                  type="date"
+                  value={calendarTarget === 'dep' ? depDate : retDate}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      if (calendarTarget === 'dep') setDepDate(e.target.value);
+                      else setRetDate(e.target.value);
+                    }
+                  }}
+                  className="bg-[#180838] border border-purple-800/80 text-white text-xs rounded-lg px-2 py-1 outline-none font-mono cursor-pointer"
+                />
+                <button
+                  type="button"
+                  onClick={() => setCalendarTarget(null)}
+                  className="px-3 py-1 rounded-lg text-xs font-bold bg-[#22C55E] text-slate-950 hover:bg-emerald-400 transition-colors cursor-pointer"
+                >
+                  Confirmar
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
