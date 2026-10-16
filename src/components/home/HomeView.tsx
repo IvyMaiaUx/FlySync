@@ -50,26 +50,61 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onSelectOffer })
     ];
   }, [balances, programs, totalBalance]);
 
-  // Featured top offers for "Ofertas de hoje" with high-appeal destinations (Miami, Santiago, Lisboa, Paris, Buenos Aires, Orlando, Bariloche, etc.)
+  // Featured top offers for "Ofertas de hoje": Sempre alternando destinos únicos e atrativos
   const todayOffers = useMemo(() => {
     const todayStr = new Date().toISOString().split('T')[0];
     const valid = offers.filter(o => o.status === 'ativa' && o.departureDate >= todayStr);
     
-    const highlightDests = ['MIA', 'SCL', 'LIS', 'EZE', 'CDG', 'MCO', 'MAD', 'CUN', 'BRC', 'GIG', 'REC', 'SSA', 'JFK', 'DXB'];
-    const highlighted = valid.filter(o => highlightDests.includes(o.destination.toUpperCase()));
-    const others = valid.filter(o => !highlightDests.includes(o.destination.toUpperCase()));
-    
-    // Pick unique destination pairs to avoid duplicates in the top carousel
-    const seenRoutes = new Set<string>();
+    // Ordem de destinos prioritários de alto apelo para garantir variedade máxima na vitrine
+    const priorityDestOrder = [
+      'MIA', // Miami
+      'SCL', // Santiago
+      'LIS', // Lisboa
+      'EZE', // Buenos Aires
+      'MAD', // Madri
+      'MCO', // Orlando
+      'CDG', // Paris
+      'CUN', // Cancún
+      'BRC', // Bariloche
+      'REC', // Recife
+      'GIG', // Rio de Janeiro
+      'JFK', // Nova York
+      'SSA', // Salvador
+      'DXB', // Dubai
+      'FLN', // Florianópolis
+      'FCO'  // Roma
+    ];
+
     const uniqueList: FlightOffer[] = [];
-    
-    for (const off of [...highlighted, ...others]) {
-      const key = `${off.origin}-${off.destination}`;
-      if (!seenRoutes.has(key)) {
-        seenRoutes.add(key);
-        uniqueList.push(off);
+    const seenDests = new Set<string>();
+
+    // 1. Para cada destino prioritário, seleciona APENAS A MELHOR oferta (garante 1 card por cidade)
+    for (const targetDest of priorityDestOrder) {
+      const candidates = valid.filter(o => o.destination.toUpperCase() === targetDest);
+      if (candidates.length > 0) {
+        // Ordena priorizando saídas de hubs principais (GRU, GIG, BSB, CNF) e menor preço
+        const sorted = [...candidates].sort((a, b) => {
+          const aHub = ['GRU', 'GIG', 'BSB', 'CNF'].includes(a.origin) ? 1 : 0;
+          const bHub = ['GRU', 'GIG', 'BSB', 'CNF'].includes(b.origin) ? 1 : 0;
+          if (aHub !== bHub) return bHub - aHub;
+          return (a.miles || 999999) - (b.miles || 999999);
+        });
+        uniqueList.push(sorted[0]);
+        seenDests.add(targetDest);
       }
       if (uniqueList.length >= 10) break;
+    }
+
+    // 2. Se ainda não completou 10 cards, preenche com outros destinos que ainda NÃO apareceram
+    if (uniqueList.length < 10) {
+      for (const off of valid) {
+        const dest = off.destination.toUpperCase();
+        if (!seenDests.has(dest)) {
+          seenDests.add(dest);
+          uniqueList.push(off);
+        }
+        if (uniqueList.length >= 10) break;
+      }
     }
     
     return uniqueList;
