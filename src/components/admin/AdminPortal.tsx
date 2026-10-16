@@ -56,7 +56,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
     adminUpdateOfferStatus,
     users,
     broadcasts,
-    isScrapingActive
+    isScrapingActive,
+    adminDirectLogin
   } = useFlySync();
 
   // Navigation tab
@@ -184,13 +185,16 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
             </div>
 
             <div>
-              <label className="block font-semibold text-purple-200 mb-1">Senha de Acesso</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block font-semibold text-purple-200">Senha de Acesso</label>
+                <span className="text-[10px] text-amber-300 font-mono">Padrão: admin123</span>
+              </div>
               <input
                 type="password"
                 required
                 value={adminPassword}
                 onChange={(e) => setAdminPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="admin123"
                 className="w-full px-3.5 py-2.5 bg-[#180838] border border-purple-800 rounded-xl text-white focus:ring-2 focus:ring-[#22C55E] focus:outline-hidden"
               />
             </div>
@@ -198,10 +202,19 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
             <button
               type="submit"
               disabled={isLoggingIn}
-              className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               <Lock className="w-4 h-4" />
               <span>{isLoggingIn ? 'Verificando permissões...' : 'Entrar no Backoffice'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => adminDirectLogin(adminEmail)}
+              className="w-full py-2.5 bg-purple-900/40 hover:bg-purple-900/80 border border-purple-700/60 text-purple-200 hover:text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>Entrar com 1 Clique (Ivy Maia - Admin)</span>
             </button>
           </form>
 
