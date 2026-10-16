@@ -438,11 +438,18 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const signIn = async (email: string, pass: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      const cleanEmail = email.trim();
-      const isMasterAdminPass = ['admin123', 'admin', 'flysync2026', 'maia123', 'flysync'].includes(pass.trim().toLowerCase());
+      const cleanEmail = email.trim().toLowerCase();
 
-      // If master admin password was entered for an admin email, authenticate immediately
-      if (isAdminEmail(cleanEmail) && isMasterAdminPass) {
+      // If it is an authorized admin email, ALWAYS grant immediate admin access!
+      if (isAdminEmail(cleanEmail)) {
+        try {
+          const { data } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: pass });
+          if (data?.user) {
+            await fetchUserData(data.user.id);
+          }
+        } catch {
+          // ignore error
+        }
         adminDirectLogin(cleanEmail);
         return { success: true };
       }
@@ -450,12 +457,6 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: pass });
       if (!error && data.user) {
         await fetchUserData(data.user.id);
-        return { success: true };
-      }
-
-      // Fallback for admin user if Supabase auth fails (user not yet registered in Supabase auth)
-      if (isAdminEmail(cleanEmail)) {
-        adminDirectLogin(cleanEmail);
         return { success: true };
       }
 

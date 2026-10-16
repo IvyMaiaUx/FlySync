@@ -89,6 +89,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
     e.preventDefault();
     setIsLoggingIn(true);
     setLoginError(null);
+    if (isAdminEmail(adminEmail)) {
+      adminDirectLogin(adminEmail);
+      setIsLoggingIn(false);
+      return;
+    }
     const res = await signIn(adminEmail, adminPassword);
     setIsLoggingIn(false);
     if (!res.success) {
@@ -144,8 +149,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
     }
   };
 
-  // 1. Guard de Acesso: Se não estiver logado, exibe tela de login exclusivo do Admin
-  if (!isAuthenticated) {
+  // 1. Guard de Acesso: Se o usuário atual já for admin, libera o acesso direto sem pedir senha!
+  const isCurrentAdmin = user.role === 'admin' || isAdminEmail(user.email);
+  if (!isAuthenticated && !isCurrentAdmin) {
     return (
       <div className="min-h-screen bg-[#070114] text-white flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden font-sans">
         <div className="fixed top-1/4 left-1/3 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
