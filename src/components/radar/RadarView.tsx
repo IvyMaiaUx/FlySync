@@ -93,7 +93,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
   // Quick Preset Routes (Top Nacionais & Internacionais)
   const quickRoutes = [
     { label: 'Todas as Rotas', origin: '', dest: '', scope: 'all' as const },
-    { label: '✈️ Internacionais', origin: '', dest: '', scope: 'international' as const },
+    { label: 'Internacionais', origin: '', dest: '', scope: 'international' as const },
     { label: 'GRU ➔ Santiago', origin: 'GRU', dest: 'SCL' },
     { label: 'GRU ➔ Buenos Aires', origin: 'GRU', dest: 'EZE' },
     { label: 'GRU ➔ Bariloche', origin: 'GRU', dest: 'BRC' },
@@ -527,7 +527,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
                     : 'text-purple-300 hover:text-white hover:bg-purple-950/40'
                 }`}
               >
-                <span>✈️ Internacionais</span>
+                <span>Internacionais</span>
               </button>
 
               <button
@@ -539,7 +539,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                <span>🇧🇷 Nacionais</span>
+                <span>Nacionais</span>
               </button>
             </div>
 

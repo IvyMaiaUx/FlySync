@@ -284,7 +284,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onSelectOffer })
 
                   {/* Top Badges */}
                   <span className="absolute top-2.5 left-2.5 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-slate-100 border border-white/10 shadow-sm z-10">
-                    {isCash ? '💵 Dinheiro' : '✈️ Milhas'}
+                    {isCash ? 'Dinheiro' : 'Milhas'}
                   </span>
 
                   <span className="absolute top-2.5 right-2.5 text-[9px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-[#3ee6a8] to-[#86efac] text-[#08060f] shadow-sm z-10">

@@ -655,10 +655,10 @@ ${isSaoPaulo
         </span>
         {[
           { key: 'all', label: 'Todas as Dicas' },
-          { key: 'sweet_spot', label: '🎯 Resgates & Destinos' },
-          { key: 'bonus_transfer', label: '⚡ Bônus de Transferência' },
-          { key: 'expiration', label: '🚨 Alerta de Vencimento' },
-          { key: 'card_strategy', label: '📊 Estratégia de Hub' }
+          { key: 'sweet_spot', label: 'Resgates & Destinos' },
+          { key: 'bonus_transfer', label: 'Bônus de Transferência' },
+          { key: 'expiration', label: 'Alerta de Vencimento' },
+          { key: 'card_strategy', label: 'Estratégia de Hub' }
         ].map(cat => {
           const isActive = activeCategory === cat.key;
           return (

@@ -116,7 +116,7 @@ export function analyzeOfferEconomilha(
   if (savedPercent >= 35) {
     verdict = 'super_deal';
     verdictBadge = 'bg-emerald-500/20 text-[#22C55E] border-emerald-500/40';
-    verdictLabel = '🔥 Super Economia com Milhas';
+    verdictLabel = 'Super Economia com Milhas';
     verdictMessage = `Emitir com milhas economiza R$ ${savedReais.toLocaleString('pt-BR')} (${savedPercent}% OFF em relação ao dinheiro). Vantagem máxima!`;
   } else if (savedPercent >= 15) {
     verdict = 'good_deal';

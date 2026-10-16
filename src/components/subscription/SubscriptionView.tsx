@@ -433,7 +433,7 @@ export const SubscriptionView: React.FC = () => {
               <span className="text-[11px] text-emerald-300 font-bold">Emitido com Alerta FlySync:</span>
               <div className="text-xl font-black text-emerald-400 font-mono">42.500 Avios (~R$ 3.400)</div>
               <span className="text-[10px] text-emerald-400/90 font-bold">
-                🔥 Você economiza R$ 10.400 nesta emissão!
+                Você economiza R$ 10.400 nesta emissão!
               </span>
             </div>
           </div>

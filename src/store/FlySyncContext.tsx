@@ -803,7 +803,7 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
             userId: user.id,
             offerId: m.id,
             savedSearchId: search.id,
-            title: `⚡ Oportunidade: ${m.origin} ➔ ${m.destination}`,
+            title: `Oportunidade: ${m.origin} ➔ ${m.destination}`,
             message: `${prog?.name || 'Programa'}: ${m.miles.toLocaleString('pt-BR')} milhas (seu limite: ${search.maxMiles.toLocaleString('pt-BR')}).`,
             channel: 'in_app',
             status: 'unread',
@@ -905,7 +905,7 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const testPushNotification = async (customRoute?: string): Promise<{ success: boolean; message: string }> => {
     const route = customRoute || 'GRU ➔ MIA';
-    const testTitle = `⚡ Alerta Radar FlySync: ${route}`;
+    const testTitle = `Alerta Radar FlySync: ${route}`;
     const testBody = `Passagens encontradas dentro do seu limite! Toque para visualizar detalhes.`;
 
     if (user.preferences.soundEnabled) playNotificationChime();

@@ -237,7 +237,7 @@ export function calculateRouteTrendInsights(
   );
 
   const sweetSpotTag =
-    percentFromLowest === 0 ? '★ O menor de todos' : percentFromLowest <= 10 ? 'Preço ótimo' : null;
+    percentFromLowest === 0 ? 'O menor de todos' : percentFromLowest <= 10 ? 'Preço ótimo' : null;
 
   const recommendationHeadline = isBuyNow
     ? percentFromLowest === 0
