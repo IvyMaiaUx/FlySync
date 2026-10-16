@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useFlySync } from '../../store/FlySyncContext';
+import { buildOfficialBookingUrl } from '../../utils/bookingUrls';
 import {
   ShieldAlert,
   ShieldCheck,
@@ -105,7 +106,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
       stops: 0,
       status: 'ativa',
       availabilityStatus: newAvailability,
-      bookingUrl: 'https://www.flysync.app/emissao-oficial'
+      bookingUrl: buildOfficialBookingUrl({
+        origin: newOrigin,
+        destination: newDest,
+        departureDate: newDepDate,
+        programId: newProgram,
+        airline: newAirline,
+        cabinClass: newCabin
+      })
     });
     setIsSubmittingOffer(false);
     setShowNewOfferModal(false);

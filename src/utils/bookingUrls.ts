@@ -144,9 +144,11 @@ export const buildOfficialBookingUrl = (params: BookingUrlParams): string => {
     }
 
     if (p.includes('latam')) {
-      return origin && dest
-        ? `https://www.latamairlines.com/br/pt/ofertas-voos?origin=${origin}&destination=${dest}${params.departureDate ? `&outbound=${params.departureDate}` : ''}`
-        : 'https://latampass.latam.com/pt_br/passagens';
+      return 'https://www.latamairlines.com/br/pt';
+    }
+
+    if (p.includes('azul')) {
+      return 'https://www.voeazul.com.br/';
     }
 
     for (const rule of PROGRAM_EMISSION_RULES) {
@@ -164,15 +166,13 @@ export const buildOfficialBookingUrl = (params: BookingUrlParams): string => {
         : 'https://www.smiles.com.br/passagens';
     }
     if (a.includes('latam')) {
-      return origin && dest
-        ? `https://www.latamairlines.com/br/pt/ofertas-voos?origin=${origin}&destination=${dest}${params.departureDate ? `&outbound=${params.departureDate}` : ''}`
-        : 'https://latampass.latam.com/pt_br/passagens';
+      return 'https://www.latamairlines.com/br/pt';
     }
     if (a.includes('azul pelo mundo')) return 'https://azulpelomundo.voeazul.com.br/';
-    if (a.includes('azul')) return 'https://www.voeazul.com.br/br/pt/resgate-pontos';
+    if (a.includes('azul')) return 'https://www.voeazul.com.br/';
     if (a.includes('iberia')) return 'https://www.iberia.com/br/';
     if (a.includes('tap')) return 'https://www.flytap.com/pt-br/miles-and-go';
-    if (a.includes('british')) return 'https://www.britishairways.com/travel/redeem/execclub/_gf/pt_br';
+    if (a.includes('british')) return 'https://www.britishairways.com/pt-br/flights-and-holidays/flights';
     if (a.includes('american')) return 'https://www.aa.com.br/';
     if (a.includes('qatar')) return 'https://www.qatarairways.com/pt-br/homepage.html';
     if (a.includes('air canada')) return 'https://www.aeroplan.com/';
@@ -210,12 +210,9 @@ export const buildGoogleFlightsUrl = (params: BookingUrlParams): string => {
 
 /**
  * Retorna a melhor URL de emissão oficial para uma oferta.
+ * Sempre garante um link oficial verificado e ativo para o programa/companhia.
  */
 export const getEffectiveBookingUrl = (offer: FlightOffer): string => {
-  if (offer.bookingUrl && offer.bookingUrl.startsWith('http') && !offer.bookingUrl.includes('google.com/travel')) {
-    return offer.bookingUrl;
-  }
-
   return buildOfficialBookingUrl({
     origin: offer.origin,
     destination: offer.destination,

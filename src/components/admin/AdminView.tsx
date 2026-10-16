@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useFlySync } from '../../store/FlySyncContext';
 import { FlightOffer, OfferSource, CollectionRun, CabinClass, OfferAvailabilityStatus } from '../../types';
+import { buildOfficialBookingUrl } from '../../utils/bookingUrls';
 import {
   ShieldAlert,
   Database,
@@ -70,7 +71,14 @@ export const AdminView: React.FC = () => {
       stops: 0,
       status: 'ativa',
       availabilityStatus: newAvailability,
-      bookingUrl: 'https://www.flysync.app/emissao-oficial'
+      bookingUrl: buildOfficialBookingUrl({
+        origin: newOrigin,
+        destination: newDest,
+        departureDate: newDepDate,
+        programId: newProgram,
+        airline: newAirline,
+        cabinClass: newCabin
+      })
     });
     setShowNewOfferModal(false);
   };

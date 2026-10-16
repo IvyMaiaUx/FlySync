@@ -965,7 +965,7 @@ export const INITIAL_CAMPAIGNS: PartnerCampaign[] = [
     bonusPercentage: 80,
     startsAt: '2026-10-10T00:00:00Z',
     endsAt: '2026-10-16T23:59:59Z', // 3 days remaining
-    destinationUrl: 'https://www.livelo.com.br/promocao-smiles',
+    destinationUrl: 'https://www.livelo.com.br/',
     isAffiliate: true,
     status: 'active',
     termsSummary: 'Válido para transferências a partir de 10.000 pontos. Bônus creditado em até 10 dias úteis e válido por 12 meses.',
@@ -995,7 +995,7 @@ export const INITIAL_CAMPAIGNS: PartnerCampaign[] = [
     bonusPercentage: 60,
     startsAt: '2026-10-08T00:00:00Z',
     endsAt: '2026-10-18T23:59:59Z',
-    destinationUrl: 'https://www.voeazul.com.br/comprar-pontos',
+    destinationUrl: 'https://www.voeazul.com.br/',
     isAffiliate: false,
     status: 'active',
     termsSummary: 'Limite de compra de 100.000 pontos por CPF. Pontos válidos por 24 meses.',
@@ -1010,7 +1010,7 @@ export const INITIAL_CAMPAIGNS: PartnerCampaign[] = [
     bonusPercentage: 70,
     startsAt: '2026-09-20T00:00:00Z',
     endsAt: '2026-09-25T23:59:59Z', // Expired campaign
-    destinationUrl: 'https://www.c6bank.com.br/atomos',
+    destinationUrl: 'https://www.c6bank.com.br/',
     isAffiliate: true,
     status: 'expired',
     termsSummary: 'Campanha encerrada em 25 de setembro de 2026.',
