@@ -40,15 +40,31 @@ export const DEFAULT_PREFERENCES: UserProfile['preferences'] = {
   phone: '(11) 98765-4321'
 };
 
-export const toProfile = (r: Row): UserProfile => ({
-  id: r.id,
-  displayName: r.display_name || (r.email ? String(r.email).split('@')[0] : 'Viajante'),
-  email: r.email || '',
-  role: r.role === 'admin' ? 'admin' : 'user',
-  plan: r.plan === 'premium' ? 'premium' : 'free',
-  createdAt: r.created_at,
-  preferences: { ...DEFAULT_PREFERENCES, ...(r.preferences || {}) }
-});
+export const ADMIN_EMAILS = [
+  'maia.operacional@gmail.com',
+  'isabelle021004@gmail.com',
+  'admin@flysync.app'
+];
+
+export const isAdminEmail = (email?: string | null): boolean => {
+  if (!email) return false;
+  return ADMIN_EMAILS.includes(email.toLowerCase().trim());
+};
+
+export const toProfile = (r: Row): UserProfile => {
+  const email = r.email || '';
+  const isAdmin = r.role === 'admin' || isAdminEmail(email);
+
+  return {
+    id: r.id,
+    displayName: r.display_name || (email ? String(email).split('@')[0] : 'Ivy Maia'),
+    email,
+    role: isAdmin ? 'admin' : 'user',
+    plan: (r.plan === 'premium' || isAdmin) ? 'premium' : 'free',
+    createdAt: r.created_at,
+    preferences: { ...DEFAULT_PREFERENCES, ...(r.preferences || {}) }
+  };
+};
 
 export const toProgram = (r: Row): LoyaltyProgram => ({
   id: r.id,

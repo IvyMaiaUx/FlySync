@@ -17,10 +17,10 @@ import scrapedOffersData from './scrapedOffers.json';
 
 export const INITIAL_USER: UserProfile = {
   id: 'usr-001',
-  displayName: 'Isabelle F.',
-  email: 'isabelle021004@gmail.com',
-  role: 'user', // switchable to 'admin'
-  plan: 'free', // switchable to 'premium'
+  displayName: 'Ivy Maia',
+  email: 'maia.operacional@gmail.com',
+  role: 'admin',
+  plan: 'premium',
   createdAt: '2026-08-15T10:00:00Z',
   preferences: {
     emailAlerts: true,

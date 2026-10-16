@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useFlySync } from '../../store/FlySyncContext';
+import { isAdminEmail } from '../../lib/mappers';
 import { Bell, BellRing, ShieldCheck, User, LogOut, Check, ChevronDown, Sparkles, Zap, Radio, Crown, Wallet } from 'lucide-react';
 import { FlySyncLogo } from '../common/FlySyncLogo';
 import { PWAInstallButton } from '../common/PWAInstallButton';
@@ -181,7 +182,7 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, setCurrentTab, openA
                         {isPremium ? 'FlySync Premium' : 'Free (Básico)'}
                       </span>
                     </div>
-                    {user.role === 'admin' && (
+                    {(user.role === 'admin' || isAdminEmail(user.email)) && (
                       <div className="mt-1 flex items-center justify-between text-xs">
                         <span className="text-purple-300">Acesso:</span>
                         <span className="font-bold text-amber-300">Administrador</span>
@@ -224,7 +225,7 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, setCurrentTab, openA
                       <Sparkles className="w-3.5 h-3.5 text-[#22C55E]" />
                       {isPremium ? 'Gerenciar Assinatura' : 'Assinar Premium (R$ 29,90)'}
                     </button>
-                    {user.role === 'admin' && (
+                    {(user.role === 'admin' || isAdminEmail(user.email)) && (
                       <button
                         onClick={() => {
                           window.location.hash = '#/admin';

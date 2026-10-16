@@ -19,6 +19,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { getDestinationImageUrl } from '../../data/destinationImages';
+import { isAdminEmail } from '../../lib/mappers';
 
 interface ProfileViewProps {
   onNavigate: (tab: string) => void;
@@ -34,7 +35,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onOpenUpgr
 
   // Account form state
   const [name, setName] = useState<string>(user.displayName || 'Ivy Maia');
-  const [email, setEmail] = useState<string>(user.email || 'ivy@flysync.app');
+  const [email, setEmail] = useState<string>(user.email || 'maia.operacional@gmail.com');
   const [phone, setPhone] = useState<string>(user.preferences.phone || '(11) 98765-4321');
   const [preferredOrigin, setPreferredOrigin] = useState<string>(user.preferences.preferredOrigin || 'GRU');
   const [preferredCabin, setPreferredCabin] = useState<'Econômica' | 'Executiva'>(
@@ -595,6 +596,30 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onOpenUpgr
           </div>
           <ChevronRight className="w-4 h-4 text-[#6f6a84] group-hover:text-white transition-colors" />
         </button>
+
+        {(user.role === 'admin' || isAdminEmail(user.email)) && (
+          <button
+            type="button"
+            onClick={() => {
+              window.location.hash = '#/admin';
+            }}
+            className="w-full flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-[#1a122e] hover:bg-[#231840] border border-amber-500/30 hover:border-amber-500/60 transition-all text-left group cursor-pointer shadow-sm"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <strong className="text-sm font-bold text-amber-300 block">Portal Administrativo</strong>
+                  <span className="text-[9px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded">Admin</span>
+                </div>
+                <small className="text-xs text-purple-200/80 block">Painel de controle, scrapers e métricas do app</small>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-amber-400/70 group-hover:text-amber-300 transition-colors" />
+          </button>
+        )}
 
         <button
           type="button"

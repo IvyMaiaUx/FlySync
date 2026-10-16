@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useFlySync } from '../../store/FlySyncContext';
 import { buildOfficialBookingUrl } from '../../utils/bookingUrls';
+import { isAdminEmail } from '../../lib/mappers';
 import {
   ShieldAlert,
   ShieldCheck,
@@ -52,7 +53,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
   const [activeTab, setActiveTab] = useState<'offers' | 'sources' | 'runs' | 'logs' | 'scraper_guide'>('offers');
 
   // Login form state for unauthenticated or non-admin users
-  const [adminEmail, setAdminEmail] = useState('');
+  const [adminEmail, setAdminEmail] = useState('maia.operacional@gmail.com');
   const [adminPassword, setAdminPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -109,8 +110,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
       bookingUrl: buildOfficialBookingUrl({
         origin: newOrigin,
         destination: newDest,
-        departureDate: newDepDate,
-        programId: newProgram,
+        departureDate: newDeptDate,
+        programId: newProgramId,
         airline: newAirline,
         cabinClass: newCabin
       })
@@ -167,7 +168,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
                 required
                 value={adminEmail}
                 onChange={(e) => setAdminEmail(e.target.value)}
-                placeholder="admin@flysync.app"
+                placeholder="maia.operacional@gmail.com"
                 className="w-full px-3.5 py-2.5 bg-[#180838] border border-purple-800 rounded-xl text-white focus:ring-2 focus:ring-[#22C55E] focus:outline-hidden"
               />
             </div>
@@ -209,7 +210,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
   }
 
   // 2. Guard de Permissão: Se está autenticado, mas NÃO tem papel 'admin' no banco
-  if (user.role !== 'admin') {
+  const isAdmin = user.role === 'admin' || isAdminEmail(user.email);
+  if (!isAdmin) {
     return (
       <div className="min-h-screen bg-[#070114] text-white flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden font-sans">
         <div className="max-w-md w-full bg-[#110526] border border-rose-500/40 rounded-3xl p-8 shadow-2xl relative z-10 space-y-6 text-center">
