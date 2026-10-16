@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { FlySyncProvider, useFlySync } from './store/FlySyncContext';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
+import { HomeView } from './components/home/HomeView';
+import { SearchView } from './components/search/SearchView';
+import { ProfileView } from './components/profile/ProfileView';
 import { WalletView } from './components/wallet/WalletView';
 import { RadarView } from './components/radar/RadarView';
 import { AlertsView } from './components/alerts/AlertsView';
@@ -17,7 +20,7 @@ import { WifiOff } from 'lucide-react';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 const MainApp: React.FC = () => {
-  const [currentTab, setCurrentTab] = useState<string>('radar');
+  const [currentTab, setCurrentTab] = useState<string>('home');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
 
@@ -104,10 +107,28 @@ const MainApp: React.FC = () => {
 
       {/* Main Viewport Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-24 md:pb-10 relative z-10">
-        {currentTab === 'wallet' && <WalletView />}
+        {currentTab === 'home' && (
+          <HomeView
+            onNavigate={setCurrentTab}
+            onSelectOffer={(offer) => {
+              setSelectedOffer(offer);
+              setCurrentTab('radar');
+            }}
+          />
+        )}
+        {currentTab === 'search' && (
+          <SearchView
+            onSelectOffer={(offer) => {
+              setSelectedOffer(offer);
+              setCurrentTab('radar');
+            }}
+            onOpenCreateAlert={handleOpenCreateAlertForRoute}
+          />
+        )}
         {currentTab === 'radar' && (
           <RadarView onOpenCreateAlertForRoute={handleOpenCreateAlertForRoute} />
         )}
+        {currentTab === 'wallet' && <WalletView />}
         {currentTab === 'alerts' && (
           <AlertsView
             onOpenUpgrade={() => setCurrentTab('subscription')}
@@ -116,6 +137,13 @@ const MainApp: React.FC = () => {
         )}
         {currentTab === 'campaigns' && <CampaignsView />}
         {currentTab === 'subscription' && <SubscriptionView />}
+        {currentTab === 'profile' && (
+          <ProfileView
+            onNavigate={setCurrentTab}
+            onOpenUpgrade={() => setCurrentTab('subscription')}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
+          />
+        )}
       </main>
 
       {/* Mobile PWA Bottom Navigation Bar */}

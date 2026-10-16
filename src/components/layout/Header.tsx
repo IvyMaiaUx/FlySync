@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFlySync } from '../../store/FlySyncContext';
-import { Bell, BellRing, ShieldCheck, User, LogOut, Check, ChevronDown, Sparkles, Zap, Radio, Crown } from 'lucide-react';
+import { Bell, BellRing, ShieldCheck, User, LogOut, Check, ChevronDown, Sparkles, Zap, Radio, Crown, Wallet } from 'lucide-react';
 import { FlySyncLogo } from '../common/FlySyncLogo';
 import { PWAInstallButton } from '../common/PWAInstallButton';
 
@@ -24,20 +24,64 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, setCurrentTab, openA
           {/* Zone 1: Brand Wordmark with Official Vector Emblem */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0">
             <button
-              onClick={() => setCurrentTab('radar')}
+              onClick={() => setCurrentTab('home')}
               className="text-left focus:outline-hidden hover:opacity-95 transition-opacity"
             >
               <FlySyncLogo size="md" isDarkTheme={true} />
             </button>
           </div>
 
-          {/* Zone 2: 4–5 clean single-line text navigation links */}
-          <nav className="hidden md:flex items-center gap-2 text-xs font-semibold">
+          {/* Zone 2: Mockup Top Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1.5 text-xs font-semibold">
+            <button
+              onClick={() => setCurrentTab('home')}
+              className={`whitespace-nowrap shrink-0 transition-all px-3 py-1.5 rounded-lg ${
+                currentTab === 'home'
+                  ? 'bg-purple-900/60 text-white font-bold border-b-2 border-[#34d399] shadow-xs'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              Hoje
+            </button>
+
+            <button
+              onClick={() => setCurrentTab('radar')}
+              className={`whitespace-nowrap shrink-0 transition-all px-3 py-1.5 rounded-lg ${
+                currentTab === 'radar'
+                  ? 'bg-purple-900/60 text-white font-bold border-b-2 border-[#34d399] shadow-xs'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              Ofertas
+            </button>
+
+            <button
+              onClick={() => setCurrentTab('search')}
+              className={`whitespace-nowrap shrink-0 transition-all px-3 py-1.5 rounded-lg ${
+                currentTab === 'search'
+                  ? 'bg-purple-900/60 text-white font-bold border-b-2 border-[#34d399] shadow-xs'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              Buscar
+            </button>
+
+            <button
+              onClick={() => setCurrentTab('campaigns')}
+              className={`whitespace-nowrap shrink-0 transition-all px-3 py-1.5 rounded-lg ${
+                currentTab === 'campaigns'
+                  ? 'bg-purple-900/60 text-white font-bold border-b-2 border-[#34d399] shadow-xs'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              Ganhar
+            </button>
+
             <button
               onClick={() => setCurrentTab('wallet')}
               className={`whitespace-nowrap shrink-0 transition-all px-3 py-1.5 rounded-lg ${
                 currentTab === 'wallet'
-                  ? 'bg-purple-900/60 text-white font-bold border-b-2 border-[#22C55E] shadow-xs'
+                  ? 'bg-purple-900/60 text-white font-bold border-b-2 border-[#34d399] shadow-xs'
                   : 'text-slate-300 hover:text-white hover:bg-white/5'
               }`}
             >
@@ -45,48 +89,10 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, setCurrentTab, openA
             </button>
 
             <button
-              onClick={() => setCurrentTab('radar')}
-              className={`whitespace-nowrap shrink-0 transition-all px-3 py-1.5 rounded-lg ${
-                currentTab === 'radar'
-                  ? 'bg-purple-900/60 text-white font-bold border-b-2 border-[#22C55E] shadow-xs'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              Radar
-            </button>
-
-            <button
-              onClick={() => setCurrentTab('alerts')}
-              className={`whitespace-nowrap shrink-0 transition-all px-3 py-1.5 rounded-lg relative flex items-center gap-1.5 ${
-                currentTab === 'alerts'
-                  ? 'bg-purple-900/60 text-white font-bold border-b-2 border-[#22C55E] shadow-xs'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <span>Alertas</span>
-              {unreadCount > 0 && (
-                <span className="text-[10px] px-1.5 py-0.2 bg-[#22C55E] text-[#0C021E] font-black rounded-md tabular-nums">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-
-            <button
-              onClick={() => setCurrentTab('campaigns')}
-              className={`whitespace-nowrap shrink-0 transition-all px-3 py-1.5 rounded-lg ${
-                currentTab === 'campaigns'
-                  ? 'bg-purple-900/60 text-white font-bold border-b-2 border-[#22C55E] shadow-xs'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              Ganhar Milhas
-            </button>
-
-            <button
               onClick={() => setCurrentTab('subscription')}
               className={`whitespace-nowrap shrink-0 transition-all px-3 py-1.5 rounded-lg flex items-center gap-1.5 cursor-pointer ${
                 currentTab === 'subscription'
-                  ? 'bg-purple-900/60 text-white font-bold border-b-2 border-[#22C55E] shadow-xs'
+                  ? 'bg-purple-900/60 text-white font-bold border-b-2 border-[#34d399] shadow-xs'
                   : 'text-slate-300 hover:text-white hover:bg-white/5'
               }`}
             >
@@ -185,10 +191,23 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, setCurrentTab, openA
 
                   <div className="py-1">
                     <button
-                      onClick={() => setCurrentTab('wallet')}
+                      onClick={() => {
+                        setCurrentTab('profile');
+                        setProfileOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs text-[#34d399] font-medium hover:bg-purple-900/40 flex items-center gap-2"
+                    >
+                      <User className="w-3.5 h-3.5 text-[#34d399]" />
+                      Meu Perfil & Preferências
+                    </button>
+                    <button
+                      onClick={() => {
+                        setCurrentTab('wallet');
+                        setProfileOpen(false);
+                      }}
                       className="w-full text-left px-4 py-2 text-xs text-slate-200 hover:bg-purple-900/40 flex items-center gap-2"
                     >
-                      <User className="w-3.5 h-3.5 text-purple-400" />
+                      <Wallet className="w-3.5 h-3.5 text-purple-400" />
                       Minha Carteira
                     </button>
                     <button

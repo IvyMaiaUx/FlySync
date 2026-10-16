@@ -6,6 +6,24 @@
   --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+:root {
+  --bg: #08060f;
+  --s: #110d1d;
+  --s2: #181328;
+  --ln: rgba(255,255,255,.08);
+  --ln2: rgba(255,255,255,.15);
+  --pu: #8b7cf6;
+  --g: #34d399;
+  --gl: #6ee7b7;
+  --cy: #5eb8ff;
+  --am: #f5b84b;
+  --tx: #f5f4fa;
+  --mu: #9d98b0;
+  --di: #6f6a84;
+  --br: linear-gradient(135deg,#3ee6a8,#2fd08a);
+  --gw: 0 10px 28px -12px rgba(52,211,153,.55);
+}
+
 @layer base {
   html, body {
     overflow-x: hidden;
@@ -16,15 +34,20 @@
 
   body {
     font-family: var(--font-sans);
-    color: #f8fafc;
-    background-color: #090218;
+    color: #f5f4fa;
+    background: radial-gradient(900px 520px at 12% -10%, rgba(110,80,235,.26), transparent 62%),
+                radial-gradient(700px 520px at 105% 8%, rgba(52,211,153,.09), transparent 60%),
+                #08060f;
+    background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
     scroll-behavior: smooth;
+    letter-spacing: -0.005em;
   }
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    font-weight: 700;
   }
 
   .font-mono, .tabular-nums {

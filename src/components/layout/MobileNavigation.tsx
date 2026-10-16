@@ -1,6 +1,5 @@
 import React from 'react';
-import { useFlySync } from '../../store/FlySyncContext';
-import { Plane, Wallet, Bell, Gift, Sparkles, ShieldCheck } from 'lucide-react';
+import { Home, Tag, Search, Calculator, Wallet } from 'lucide-react';
 
 interface MobileNavigationProps {
   currentTab: string;
@@ -8,128 +7,37 @@ interface MobileNavigationProps {
 }
 
 export const MobileNavigation: React.FC<MobileNavigationProps> = ({ currentTab, setCurrentTab }) => {
-  const { notifications, user, subscription } = useFlySync();
-  const unreadCount = notifications.filter(n => n.status === 'unread').length;
-  const isPremium = user.plan === 'premium' || subscription?.status === 'active';
+  const tabs = [
+    { id: 'home', label: 'Hoje', icon: Home },
+    { id: 'radar', label: 'Ofertas', icon: Tag },
+    { id: 'search', label: 'Buscar', icon: Search },
+    { id: 'campaigns', label: 'Ganhar', icon: Calculator },
+    { id: 'wallet', label: 'Carteira', icon: Wallet }
+  ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0E0324]/95 backdrop-blur-xl border-t border-purple-900/60 px-2 py-1 shadow-2xl safe-area-inset-bottom">
-      <div className="flex items-center justify-around max-w-lg mx-auto">
-        {/* Tab 1: Radar (Supersonic Jet Cyan) */}
-        <button
-          onClick={() => setCurrentTab('radar')}
-          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all ${
-            currentTab === 'radar'
-              ? 'text-cyan-400 font-bold'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <div className="relative">
-            <Plane className={`w-5 h-5 ${currentTab === 'radar' ? 'text-cyan-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.7)]' : ''}`} />
-            {currentTab === 'radar' && (
-              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-cyan-400" />
-            )}
-          </div>
-          <span className="text-[10px] mt-1 tracking-tight">Radar</span>
-        </button>
+    <nav className="md:hidden fixed left-3 right-3 bottom-[calc(10px+env(safe-area-inset-bottom,0px))] z-40 max-w-[520px] mx-auto grid grid-cols-5 gap-1 p-2 rounded-[24px] bg-[#110d1d]/80 backdrop-blur-2xl border border-white/15 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(255,255,255,0.06)]">
+      {tabs.map(t => {
+        const Icon = t.icon;
+        const isActive = currentTab === t.id;
 
-        {/* Tab 2: Carteira (Neon Ticket Green) */}
-        <button
-          onClick={() => setCurrentTab('wallet')}
-          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all ${
-            currentTab === 'wallet'
-              ? 'text-[#22C55E] font-bold'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <div className="relative">
-            <Wallet className={`w-5 h-5 ${currentTab === 'wallet' ? 'text-[#22C55E] drop-shadow-[0_0_8px_rgba(34,197,94,0.7)]' : ''}`} />
-            {currentTab === 'wallet' && (
-              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#22C55E]" />
-            )}
-          </div>
-          <span className="text-[10px] mt-1 tracking-tight">Carteira</span>
-        </button>
-
-        {/* Tab 3: Alertas */}
-        <button
-          onClick={() => setCurrentTab('alerts')}
-          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all relative ${
-            currentTab === 'alerts'
-              ? 'text-purple-300 font-bold'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <div className="relative">
-            <Bell className={`w-5 h-5 ${currentTab === 'alerts' ? 'text-purple-300 drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]' : ''}`} />
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-2 px-1 py-0.2 bg-[#22C55E] text-slate-950 text-[9px] font-black rounded-full tabular-nums">
-                {unreadCount}
-              </span>
-            )}
-            {currentTab === 'alerts' && (
-              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-purple-400" />
-            )}
-          </div>
-          <span className="text-[10px] mt-1 tracking-tight">Alertas</span>
-        </button>
-
-        {/* Tab 4: Ganhar Milhas */}
-        <button
-          onClick={() => setCurrentTab('campaigns')}
-          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all ${
-            currentTab === 'campaigns'
-              ? 'text-emerald-400 font-bold'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <div className="relative">
-            <Gift className={`w-5 h-5 ${currentTab === 'campaigns' ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.7)]' : ''}`} />
-            {currentTab === 'campaigns' && (
-              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-emerald-400" />
-            )}
-          </div>
-          <span className="text-[10px] mt-1 tracking-tight">Ganhar</span>
-        </button>
-
-        {/* Tab 5: Planos */}
-        <button
-          onClick={() => setCurrentTab('subscription')}
-          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all ${
-            currentTab === 'subscription'
-              ? 'text-amber-300 font-bold'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <div className="relative">
-            <Sparkles className={`w-5 h-5 ${currentTab === 'subscription' ? 'text-amber-300 drop-shadow-[0_0_8px_rgba(252,211,77,0.7)]' : ''}`} />
-            {isPremium && (
-              <span className="absolute -top-1 -right-2 text-[8px] px-1 bg-emerald-500 text-slate-950 font-black rounded-sm uppercase">
-                Pro
-              </span>
-            )}
-            {currentTab === 'subscription' && (
-              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-amber-400" />
-            )}
-          </div>
-          <span className="text-[10px] mt-1 tracking-tight">Planos</span>
-        </button>
-
-        {/* Admin (Only if Admin) */}
-        {user.role === 'admin' && (
+        return (
           <button
-            onClick={() => setCurrentTab('admin')}
-            className={`flex flex-col items-center justify-center py-1.5 px-2 rounded-xl transition-all ${
-              currentTab === 'admin'
-                ? 'text-amber-400 font-bold'
-                : 'text-amber-300/60 hover:text-amber-200'
+            key={t.id}
+            type="button"
+            onClick={() => setCurrentTab(t.id)}
+            className={`flex flex-col items-center justify-center gap-1 py-1 rounded-2xl transition-all cursor-pointer ${
+              isActive ? 'text-white font-bold' : 'text-[#6f6a84] hover:text-[#9d98b0]'
             }`}
           >
-            <ShieldCheck className="w-5 h-5" />
-            <span className="text-[10px] mt-1 tracking-tight">Admin</span>
+            <Icon className={`w-5 h-5 transition-transform ${isActive ? 'text-[#34d399] scale-105' : ''}`} />
+            <span className="text-[10px] tracking-tight">{t.label}</span>
+            {isActive && (
+              <span className="w-1 h-1 rounded-full bg-[#34d399] shadow-[0_0_6px_#34d399]" />
+            )}
           </button>
-        )}
-      </div>
+        );
+      })}
     </nav>
   );
 };
