@@ -177,20 +177,18 @@ export const SearchView: React.FC<SearchViewProps> = ({ onSelectOffer, onOpenCre
           </button>
         </div>
 
-        {/* Origin Airport */}
-        <div className="flex items-center gap-3 bg-[#181328] border border-white/15 focus-within:border-[#8b7cf6] rounded-2xl px-4 py-2.5 transition-colors">
-          <MapPin className="w-5 h-5 text-[#8b7cf6] shrink-0" />
-          <div className="flex-1 min-w-0">
-            <span className="text-[10px] uppercase font-bold text-[#6f6a84] block">Origem</span>
-            <input
-              type="text"
-              value={origin}
-              onChange={e => setOrigin(e.target.value.toUpperCase())}
-              placeholder="Código ou Cidade (ex: CGH, GRU, GIG)"
-              className="w-full bg-transparent text-white font-bold text-sm sm:text-base outline-none"
-            />
-          </div>
-        </div>
+        {/* Origin Airport with Autocomplete & Suggestions */}
+        <AirportSelect
+          value={origin}
+          onChange={setOrigin}
+          placeholder="Código ou Cidade (ex: CGH, GRU, GIG)"
+          label="Origem"
+          iconType="takeoff"
+          offers={offers}
+          isOrigin={true}
+          variant="large"
+          showQuickChips={true}
+        />
 
         {/* Swap Button */}
         <div className="flex justify-center -my-1">
@@ -204,20 +202,18 @@ export const SearchView: React.FC<SearchViewProps> = ({ onSelectOffer, onOpenCre
           </button>
         </div>
 
-        {/* Destination Airport */}
-        <div className="flex items-center gap-3 bg-[#181328] border border-white/15 focus-within:border-[#8b7cf6] rounded-2xl px-4 py-2.5 transition-colors">
-          <MapPin className="w-5 h-5 text-[#8b7cf6] shrink-0" />
-          <div className="flex-1 min-w-0">
-            <span className="text-[10px] uppercase font-bold text-[#6f6a84] block">Destino</span>
-            <input
-              type="text"
-              value={destination}
-              onChange={e => setDestination(e.target.value.toUpperCase())}
-              placeholder="Código ou Cidade (ex: REC, MAD, MIA)"
-              className="w-full bg-transparent text-white font-bold text-sm sm:text-base outline-none"
-            />
-          </div>
-        </div>
+        {/* Destination Airport with Autocomplete & Suggestions */}
+        <AirportSelect
+          value={destination}
+          onChange={setDestination}
+          placeholder="Código ou Cidade (ex: REC, MAD, MIA)"
+          label="Destino"
+          iconType="landing"
+          offers={offers}
+          isOrigin={false}
+          variant="large"
+          showQuickChips={true}
+        />
 
         {/* Dates & Cabin Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">

@@ -3,6 +3,35 @@ import { AIRPORTS, AirportItem, findAirportByIata, GLOBAL_AIRPORTS_DICT } from '
 import { Search, X, PlaneTakeoff, PlaneLanding, MapPin, Check, Sparkles } from 'lucide-react';
 import { FlightOffer } from '../../types';
 
+const TOP_ORIGINS: { iata: string; city: string }[] = [
+  { iata: 'GRU', city: 'São Paulo' },
+  { iata: 'CGH', city: 'Congonhas' },
+  { iata: 'GIG', city: 'Rio Galeão' },
+  { iata: 'SDU', city: 'Santos Dumont' },
+  { iata: 'BSB', city: 'Brasília' },
+  { iata: 'CNF', city: 'Belo Horizonte' },
+  { iata: 'VCP', city: 'Campinas' },
+  { iata: 'REC', city: 'Recife' },
+  { iata: 'SSA', city: 'Salvador' },
+  { iata: 'POA', city: 'Porto Alegre' },
+  { iata: 'FOR', city: 'Fortaleza' }
+];
+
+const TOP_DESTINATIONS: { iata: string; city: string }[] = [
+  { iata: 'MIA', city: 'Miami' },
+  { iata: 'LIS', city: 'Lisboa' },
+  { iata: 'MAD', city: 'Madri' },
+  { iata: 'SCL', city: 'Santiago' },
+  { iata: 'EZE', city: 'Buenos Aires' },
+  { iata: 'MCO', city: 'Orlando' },
+  { iata: 'CDG', city: 'Paris' },
+  { iata: 'REC', city: 'Recife' },
+  { iata: 'SSA', city: 'Salvador' },
+  { iata: 'CUN', city: 'Cancún' },
+  { iata: 'JFK', city: 'Nova York' },
+  { iata: 'DXB', city: 'Dubai' }
+];
+
 interface AirportSelectProps {
   value: string;
   onChange: (val: string) => void;
@@ -13,6 +42,8 @@ interface AirportSelectProps {
   isOrigin?: boolean;
   className?: string;
   required?: boolean;
+  showQuickChips?: boolean;
+  variant?: 'compact' | 'large';
 }
 
 export const AirportSelect: React.FC<AirportSelectProps> = ({
@@ -24,11 +55,16 @@ export const AirportSelect: React.FC<AirportSelectProps> = ({
   offers = [],
   isOrigin = true,
   className = '',
-  required = false
+  required = false,
+  showQuickChips = false,
+  variant = 'compact'
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(value);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Quick suggestions list for origin vs destination
+  const quickSuggestions = isOrigin ? TOP_ORIGINS : TOP_DESTINATIONS;
 
   // Sincroniza searchTerm se value mudar externamente (ex: botão de limpar ou reset)
   useEffect(() => {
@@ -169,7 +205,7 @@ export const AirportSelect: React.FC<AirportSelectProps> = ({
     });
   }, [searchTerm, availableRoutesMap]);
 
-  const handleSelect = (airport: AirportItem) => {
+  const handleSelect = (airport: { iata: string; city?: string }) => {
     setSearchTerm(airport.iata);
     onChange(airport.iata);
     setIsOpen(false);
@@ -189,15 +225,22 @@ export const AirportSelect: React.FC<AirportSelectProps> = ({
   };
 
   const renderIcon = () => {
+    const isLarge = variant === 'large';
+    const iconClass = isLarge
+      ? "w-4 h-4 text-[#8b7cf6] absolute left-3.5 top-3.5"
+      : "w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5";
+
     switch (iconType) {
       case 'takeoff':
-        return <PlaneTakeoff className="w-3.5 h-3.5 text-cyan-400 absolute left-2.5 top-2.5" />;
+        return <PlaneTakeoff className={isLarge ? iconClass : "w-3.5 h-3.5 text-cyan-400 absolute left-2.5 top-2.5"} />;
       case 'landing':
-        return <PlaneLanding className="w-3.5 h-3.5 text-emerald-400 absolute left-2.5 top-2.5" />;
+        return <PlaneLanding className={isLarge ? iconClass : "w-3.5 h-3.5 text-emerald-400 absolute left-2.5 top-2.5"} />;
       default:
-        return <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />;
+        return <Search className={iconClass} />;
     }
   };
+
+  const isLarge = variant === 'large';
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -215,7 +258,11 @@ export const AirportSelect: React.FC<AirportSelectProps> = ({
           onFocus={() => setIsOpen(true)}
           placeholder={placeholder}
           required={required}
-          className="w-full pl-8 pr-7 py-2 text-xs border border-purple-800/80 rounded-lg bg-[#1A0B3B] text-white focus:ring-2 focus:ring-[#22C55E] focus:outline-hidden uppercase font-mono placeholder:font-sans placeholder:normal-case placeholder:text-slate-500"
+          className={
+            isLarge
+              ? "w-full pl-10 pr-8 py-3 text-sm font-bold border border-white/15 focus:border-[#8b7cf6] rounded-2xl bg-[#181328] text-white focus:outline-hidden uppercase font-mono placeholder:font-sans placeholder:normal-case placeholder:text-slate-500 transition-colors"
+              : "w-full pl-8 pr-7 py-2 text-xs border border-purple-800/80 rounded-lg bg-[#1A0B3B] text-white focus:ring-2 focus:ring-[#22C55E] focus:outline-hidden uppercase font-mono placeholder:font-sans placeholder:normal-case placeholder:text-slate-500"
+          }
         />
 
         {renderIcon()}
@@ -224,7 +271,9 @@ export const AirportSelect: React.FC<AirportSelectProps> = ({
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-2 top-2 p-0.5 text-slate-400 hover:text-white rounded-md hover:bg-purple-900/60 transition-colors cursor-pointer"
+            className={`absolute right-2 p-1 text-slate-400 hover:text-white rounded-md hover:bg-purple-900/60 transition-colors cursor-pointer ${
+              isLarge ? "top-3" : "top-2"
+            }`}
             title="Limpar campo"
           >
             <X className="w-3.5 h-3.5" />
@@ -232,22 +281,66 @@ export const AirportSelect: React.FC<AirportSelectProps> = ({
         )}
       </div>
 
-      {/* Dropdown com a Lista de IATAs e Aeroportos */}
+      {/* Sugestões Rápidas em Chips (abaixo do campo, se solicitado) */}
+      {showQuickChips && (
+        <div className="flex items-center gap-1.5 overflow-x-auto pt-2 pb-0.5 scrollbar-none text-xs">
+          <span className="text-[10px] text-slate-400 uppercase font-semibold shrink-0 flex items-center gap-1">
+            <Sparkles className="w-3 h-3 text-[#22C55E]" />
+            Sugestões:
+          </span>
+          {quickSuggestions.slice(0, 7).map(s => {
+            const isSelected = value.toUpperCase() === s.iata;
+            return (
+              <button
+                key={s.iata}
+                type="button"
+                onClick={() => handleSelect(s)}
+                className={`px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold transition-all shrink-0 cursor-pointer ${
+                  isSelected
+                    ? "bg-[#22C55E] text-slate-950 shadow-sm"
+                    : "bg-[#181328] hover:bg-purple-900/60 text-slate-300 border border-white/10 hover:text-white"
+                }`}
+              >
+                {s.iata}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Dropdown com a Lista de Sugestões e Aeroportos */}
       {isOpen && (
         <div
           className={`absolute top-full mt-2 z-50 w-[320px] sm:w-[380px] max-w-[calc(100vw-2rem)] rounded-2xl bg-[#120529]/95 border border-purple-500/40 shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-xl overflow-hidden ${
             isOrigin ? 'left-0' : 'left-0 sm:left-auto sm:right-0'
           }`}
         >
-          {/* Header da lista */}
-          <div className="px-3.5 py-2.5 bg-[#0A0218]/90 border-b border-purple-900/50 flex items-center justify-between text-[11px] font-bold">
-            <span className="flex items-center gap-1.5 text-purple-300">
-              <Sparkles className="w-3.5 h-3.5 text-[#22C55E]" />
-              <span>{searchTerm ? 'Resultados da Busca' : 'Aeroportos no Radar'}</span>
-            </span>
-            <span className="text-[10px] text-slate-400 bg-purple-950/80 border border-purple-800/50 px-2 py-0.5 rounded-full font-mono">
-              {filteredAirports.length} {filteredAirports.length === 1 ? 'opção' : 'opções'}
-            </span>
+          {/* Header da lista com Sugestões Populares */}
+          <div className="px-3.5 py-2.5 bg-[#0A0218]/90 border-b border-purple-900/50 space-y-2">
+            <div className="flex items-center justify-between text-[11px] font-bold">
+              <span className="flex items-center gap-1.5 text-purple-300">
+                <Sparkles className="w-3.5 h-3.5 text-[#22C55E]" />
+                <span>{searchTerm ? 'Resultados da Busca' : 'Sugestões no Radar'}</span>
+              </span>
+              <span className="text-[10px] text-slate-400 bg-purple-950/80 border border-purple-800/50 px-2 py-0.5 rounded-full font-mono">
+                {filteredAirports.length} {filteredAirports.length === 1 ? 'opção' : 'opções'}
+              </span>
+            </div>
+
+            {/* Sugestões Populares para 1 clique dentro do dropdown */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none pt-0.5">
+              <span className="text-[9px] uppercase font-bold text-slate-400 shrink-0">Mais buscados:</span>
+              {quickSuggestions.map(s => (
+                <button
+                  key={s.iata}
+                  type="button"
+                  onClick={() => handleSelect(s)}
+                  className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#1C0938] hover:bg-[#22C55E] hover:text-slate-950 text-purple-200 border border-purple-700/60 transition-colors whitespace-nowrap cursor-pointer shrink-0"
+                >
+                  {s.iata} · {s.city}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="p-1.5 max-h-80 overflow-y-auto space-y-1">
