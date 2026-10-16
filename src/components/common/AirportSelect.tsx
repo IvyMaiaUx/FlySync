@@ -42,7 +42,6 @@ interface AirportSelectProps {
   isOrigin?: boolean;
   className?: string;
   required?: boolean;
-  showQuickChips?: boolean;
   variant?: 'compact' | 'large';
 }
 
@@ -56,7 +55,6 @@ export const AirportSelect: React.FC<AirportSelectProps> = ({
   isOrigin = true,
   className = '',
   required = false,
-  showQuickChips = false,
   variant = 'compact'
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -279,130 +277,109 @@ export const AirportSelect: React.FC<AirportSelectProps> = ({
             <X className="w-3.5 h-3.5" />
           </button>
         )}
-      </div>
 
-      {/* Sugestões Rápidas em Chips (abaixo do campo, se solicitado) */}
-      {showQuickChips && (
-        <div className="flex items-center gap-1.5 overflow-x-auto pt-2 pb-0.5 scrollbar-none text-xs">
-          <span className="text-[10px] text-slate-400 uppercase font-semibold shrink-0 flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-[#22C55E]" />
-            Sugestões:
-          </span>
-          {quickSuggestions.slice(0, 7).map(s => {
-            const isSelected = value.toUpperCase() === s.iata;
-            return (
-              <button
-                key={s.iata}
-                type="button"
-                onClick={() => handleSelect(s)}
-                className={`px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold transition-all shrink-0 cursor-pointer ${
-                  isSelected
-                    ? "bg-[#22C55E] text-slate-950 shadow-sm"
-                    : "bg-[#181328] hover:bg-purple-900/60 text-slate-300 border border-white/10 hover:text-white"
-                }`}
-              >
-                {s.iata}
-              </button>
-            );
-          })}
-        </div>
-      )}
+        {/* Dropdown com a Lista de Sugestões e Aeroportos */}
+        {isOpen && (
+          <div
+            className="absolute top-full left-0 right-0 mt-1.5 z-50 w-full rounded-2xl bg-[#120529]/95 border border-purple-500/40 shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-xl overflow-hidden"
+          >
+            {/* Header da lista com Sugestões Populares */}
+            <div className="px-3.5 py-2.5 bg-[#0A0218]/90 border-b border-purple-900/50 space-y-2">
+              <div className="flex items-center justify-between text-[11px] font-bold">
+                <span className="flex items-center gap-1.5 text-purple-300">
+                  <Sparkles className="w-3.5 h-3.5 text-[#22C55E]" />
+                  <span>{searchTerm ? 'Resultados da Busca' : 'Sugestões no Radar'}</span>
+                </span>
+                <span className="text-[10px] text-slate-400 bg-purple-950/80 border border-purple-800/50 px-2 py-0.5 rounded-full font-mono">
+                  {filteredAirports.length} {filteredAirports.length === 1 ? 'opção' : 'opções'}
+                </span>
+              </div>
 
-      {/* Dropdown com a Lista de Sugestões e Aeroportos */}
-      {isOpen && (
-        <div
-          className={`absolute top-full mt-2 z-50 w-[320px] sm:w-[380px] max-w-[calc(100vw-2rem)] rounded-2xl bg-[#120529]/95 border border-purple-500/40 shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-xl overflow-hidden ${
-            isOrigin ? 'left-0' : 'left-0 sm:left-auto sm:right-0'
-          }`}
-        >
-          {/* Header da lista com Sugestões Populares */}
-          <div className="px-3.5 py-2.5 bg-[#0A0218]/90 border-b border-purple-900/50 space-y-2">
-            <div className="flex items-center justify-between text-[11px] font-bold">
-              <span className="flex items-center gap-1.5 text-purple-300">
-                <Sparkles className="w-3.5 h-3.5 text-[#22C55E]" />
-                <span>{searchTerm ? 'Resultados da Busca' : 'Sugestões no Radar'}</span>
-              </span>
-              <span className="text-[10px] text-slate-400 bg-purple-950/80 border border-purple-800/50 px-2 py-0.5 rounded-full font-mono">
-                {filteredAirports.length} {filteredAirports.length === 1 ? 'opção' : 'opções'}
-              </span>
-            </div>
-
-            {/* Sugestões Populares para 1 clique dentro do dropdown */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none pt-0.5">
-              <span className="text-[9px] uppercase font-bold text-slate-400 shrink-0">Mais buscados:</span>
-              {quickSuggestions.map(s => (
-                <button
-                  key={s.iata}
-                  type="button"
-                  onClick={() => handleSelect(s)}
-                  className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#1C0938] hover:bg-[#22C55E] hover:text-slate-950 text-purple-200 border border-purple-700/60 transition-colors whitespace-nowrap cursor-pointer shrink-0"
-                >
-                  {s.iata} · {s.city}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="p-1.5 max-h-80 overflow-y-auto space-y-1">
-            {filteredAirports.length > 0 ? (
-              filteredAirports.map(airport => {
-                const count = availableRoutesMap.get(airport.iata) || 0;
-                const isSelected = value.toUpperCase() === airport.iata;
-
-                return (
+              {/* Sugestões Populares para 1 clique dentro do dropdown */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none pt-0.5">
+                <span className="text-[9px] uppercase font-bold text-slate-400 shrink-0">Mais buscados:</span>
+                {quickSuggestions.map(s => (
                   <button
-                    key={airport.iata}
+                    key={s.iata}
                     type="button"
-                    onClick={() => handleSelect(airport)}
-                    className={`w-full px-3 py-2.5 rounded-xl text-left transition-all flex items-center justify-between gap-3 cursor-pointer group ${
-                      isSelected
-                        ? 'bg-purple-900/80 text-white border border-[#22C55E]/60 shadow-[0_0_12px_rgba(34,197,94,0.2)]'
-                        : 'hover:bg-purple-900/40 text-slate-200 border border-transparent hover:border-purple-800/40'
-                    }`}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSelect(s);
+                    }}
+                    onClick={() => handleSelect(s)}
+                    className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#1C0938] hover:bg-[#22C55E] hover:text-slate-950 text-purple-200 border border-purple-700/60 transition-colors whitespace-nowrap cursor-pointer shrink-0"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      {/* Badge IATA em destaque */}
-                      <span className="px-2.5 py-1.5 rounded-lg bg-[#220946] border border-purple-700/80 text-[#22C55E] group-hover:border-[#22C55E]/60 font-mono font-black text-xs tracking-wider shrink-0 shadow-inner">
-                        {airport.iata}
-                      </span>
+                    {s.iata} · {s.city}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-                      <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-white truncate flex items-center gap-1.5">
-                          <span>{airport.city}</span>
-                          <span className="text-[10px] text-purple-300/80 font-normal">({airport.country})</span>
-                        </div>
-                        <div className="text-[11px] text-slate-400 truncate mt-0.5">
-                          {airport.name}
+            <div className="p-1.5 max-h-80 overflow-y-auto space-y-1">
+              {filteredAirports.length > 0 ? (
+                filteredAirports.map(airport => {
+                  const count = availableRoutesMap.get(airport.iata) || 0;
+                  const isSelected = value.toUpperCase() === airport.iata;
+
+                  return (
+                    <button
+                      key={airport.iata}
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleSelect(airport);
+                      }}
+                      onClick={() => handleSelect(airport)}
+                      className={`w-full px-3 py-2.5 rounded-xl text-left transition-all flex items-center justify-between gap-3 cursor-pointer group ${
+                        isSelected
+                          ? 'bg-purple-900/80 text-white border border-[#22C55E]/60 shadow-[0_0_12px_rgba(34,197,94,0.2)]'
+                          : 'hover:bg-purple-900/40 text-slate-200 border border-transparent hover:border-purple-800/40'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Badge IATA em destaque */}
+                        <span className="px-2.5 py-1.5 rounded-lg bg-[#220946] border border-purple-700/80 text-[#22C55E] group-hover:border-[#22C55E]/60 font-mono font-black text-xs tracking-wider shrink-0 shadow-inner">
+                          {airport.iata}
+                        </span>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="text-xs font-bold text-white truncate flex items-center gap-1.5">
+                            <span>{airport.city}</span>
+                            <span className="text-[10px] text-purple-300/80 font-normal">({airport.country})</span>
+                          </div>
+                          <div className="text-[11px] text-slate-400 truncate mt-0.5">
+                            {airport.name}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      {count > 0 && (
-                        <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/70 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                          {count} {count === 1 ? 'oferta' : 'ofertas'}
-                        </span>
-                      )}
-                      {isSelected && (
-                        <Check className="w-4 h-4 text-[#22C55E] stroke-[3]" />
-                      )}
-                    </div>
-                  </button>
-                );
-              })
-            ) : (
-              <div className="p-4 text-center text-xs text-slate-400">
-                <MapPin className="w-6 h-6 mx-auto mb-1.5 text-purple-400 opacity-60" />
-                <p className="font-semibold text-slate-300">Nenhum aeroporto encontrado para <strong>"{searchTerm}"</strong></p>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  Você pode pressionar Enter ou pesquisar diretamente por <strong>{searchTerm.toUpperCase()}</strong>.
-                </p>
-              </div>
-            )}
+                      <div className="flex items-center gap-2 shrink-0">
+                        {count > 0 && (
+                          <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/70 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            {count} {count === 1 ? 'oferta' : 'ofertas'}
+                          </span>
+                        )}
+                        {isSelected && (
+                          <Check className="w-4 h-4 text-[#22C55E] stroke-[3]" />
+                        )}
+                      </div>
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="p-4 text-center text-xs text-slate-400">
+                  <MapPin className="w-6 h-6 mx-auto mb-1.5 text-purple-400 opacity-60" />
+                  <p className="font-semibold text-slate-300">Nenhum aeroporto encontrado para <strong>"{searchTerm}"</strong></p>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    Você pode pressionar Enter ou pesquisar diretamente por <strong>{searchTerm.toUpperCase()}</strong>.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
