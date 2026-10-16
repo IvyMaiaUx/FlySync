@@ -65,6 +65,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
   const [maxMiles, setMaxMiles] = useState<number>(300000);
   const [selectedMonth, setSelectedMonth] = useState<string>('all'); // e.g. 'all' or '2026-11'
   const [paymentMode, setPaymentMode] = useState<'all' | 'miles' | 'cash'>('all');
+  const [scopeFilter, setScopeFilter] = useState<'all' | 'international' | 'domestic'>('all');
   const [sortBy, setSortBy] = useState<'miles_asc' | 'date_desc' | 'verified_desc' | 'cash_asc'>('miles_asc');
 
   // View Mode: 'cards' (individual offers) or 'routes' (grouped multi-month routes)
@@ -80,15 +81,33 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
   const [calendarRouteKey, setCalendarRouteKey] = useState<string | null>(null);
   const [calendarInitialOffer, setCalendarInitialOffer] = useState<FlightOffer | null>(null);
 
-  // Quick Preset Routes
+  // Set of known international destination and hub airports
+  const INTERNATIONAL_AIRPORTS = useMemo(() => new Set([
+    'MIA', 'MCO', 'ORL', 'JFK', 'EWR', 'LAX', 'SFO', 'BOS', 'ORD', 'ATL', 'IAD', 'YYZ', 'YVR',
+    'LIS', 'OPO', 'MAD', 'BCN', 'CDG', 'ORY', 'LHR', 'LGW', 'FCO', 'MXP', 'FRA', 'MUC', 'AMS', 'ZRH',
+    'EZE', 'AEP', 'SCL', 'MVD', 'BOG', 'LIM', 'BRC', 'MDZ', 'CTG',
+    'CUN', 'PUJ', 'CUR', 'NAS', 'SJU',
+    'DXB', 'DOH', 'IST', 'JNB', 'NRT', 'HND'
+  ]), []);
+
+  // Quick Preset Routes (Top Nacionais & Internacionais)
   const quickRoutes = [
-    { label: 'Todas as Rotas', origin: '', dest: '' },
+    { label: 'Todas as Rotas', origin: '', dest: '', scope: 'all' as const },
+    { label: '✈️ Internacionais', origin: '', dest: '', scope: 'international' as const },
+    { label: 'GRU ➔ Santiago', origin: 'GRU', dest: 'SCL' },
+    { label: 'GRU ➔ Buenos Aires', origin: 'GRU', dest: 'EZE' },
+    { label: 'GRU ➔ Bariloche', origin: 'GRU', dest: 'BRC' },
     { label: 'GRU ➔ Miami', origin: 'GRU', dest: 'MIA' },
-    { label: 'GIG ➔ Madri (Executiva)', origin: 'GIG', dest: 'MAD', cabin: 'business' },
-    { label: 'SP ➔ Buenos Aires', origin: 'GRU', dest: 'EZE' },
     { label: 'VCP ➔ Orlando', origin: 'VCP', dest: 'MCO' },
+    { label: 'GRU ➔ Nova York', origin: 'GRU', dest: 'JFK' },
+    { label: 'GRU ➔ Cancún', origin: 'GRU', dest: 'CUN' },
     { label: 'Nordeste ➔ Lisboa', origin: 'FOR', dest: 'LIS' },
-    { label: 'Nacionais (Ponte & Praia)', origin: 'CGH', dest: 'REC' }
+    { label: 'GIG ➔ Madri (Executiva)', origin: 'GIG', dest: 'MAD', cabin: 'business' },
+    { label: 'GRU ➔ Paris', origin: 'GRU', dest: 'CDG' },
+    { label: 'GRU ➔ Roma', origin: 'GRU', dest: 'FCO' },
+    { label: 'GRU ➔ Londres', origin: 'GRU', dest: 'LHR' },
+    { label: 'GRU ➔ Dubai', origin: 'GRU', dest: 'DXB' },
+    { label: 'Nacionais (Ponte & Praia)', origin: 'CGH', dest: 'REC', scope: 'domestic' as const }
   ];
 
   // Extract all unique months available across offers for quick pill filtering
@@ -117,7 +136,12 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
   const handleApplyPreset = (route: typeof quickRoutes[0]) => {
     setOriginSearch(route.origin);
     setDestSearch(route.dest);
-    if (route.cabin) {
+    if ('scope' in route && route.scope) {
+      setScopeFilter(route.scope);
+    } else {
+      setScopeFilter('all');
+    }
+    if ('cabin' in route && route.cabin) {
       setCabinClass(route.cabin);
     } else {
       setCabinClass('all');
@@ -127,6 +151,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
   const handleResetFilters = () => {
     setOriginSearch('');
     setDestSearch('');
+    setScopeFilter('all');
     setSelectedProgram('all');
     setCabinClass('all');
     setTripType('all');
@@ -192,6 +217,17 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
         return false;
       }
 
+      // Scope filter (Internacionais vs Nacionais)
+      if (scopeFilter === 'international') {
+        const isInter = INTERNATIONAL_AIRPORTS.has(offer.destination.toUpperCase()) ||
+                        INTERNATIONAL_AIRPORTS.has(offer.origin.toUpperCase());
+        if (!isInter) return false;
+      } else if (scopeFilter === 'domestic') {
+        const isInter = INTERNATIONAL_AIRPORTS.has(offer.destination.toUpperCase()) ||
+                        INTERNATIONAL_AIRPORTS.has(offer.origin.toUpperCase());
+        if (isInter) return false;
+      }
+
       return true;
     }).sort((a, b) => {
       if (sortBy === 'miles_asc') return a.miles - b.miles;
@@ -204,7 +240,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
       }
       return 0;
     });
-  }, [offers, originSearch, destSearch, selectedProgram, cabinClass, tripType, selectedMonth, paymentMode, maxMiles, sortBy]);
+  }, [offers, originSearch, destSearch, selectedProgram, cabinClass, tripType, selectedMonth, paymentMode, scopeFilter, maxMiles, sortBy, INTERNATIONAL_AIRPORTS]);
 
   // Grouped Routes calculation for Multi-Month View
   const groupedRoutes = useMemo(() => {
@@ -291,7 +327,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
   useEffect(() => {
     setVisibleRoutesCount(PAGE_SIZE);
     setVisibleOffersCount(PAGE_SIZE);
-  }, [originSearch, destSearch, selectedProgram, cabinClass, tripType, maxMiles, selectedMonth, paymentMode, sortBy]);
+  }, [originSearch, destSearch, selectedProgram, cabinClass, tripType, maxMiles, selectedMonth, paymentMode, scopeFilter, sortBy]);
 
   // Sliced arrays for smooth rendering without DOM overload
   const displayedRoutes = useMemo(() => {
@@ -465,6 +501,45 @@ export const RadarView: React.FC<RadarViewProps> = ({ onOpenCreateAlertForRoute 
               >
                 <DollarSign className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>Em Dinheiro (R$)</span>
+              </button>
+            </div>
+
+            {/* Filtro de Abrangência (Todas / Internacionais / Nacionais) */}
+            <div className="flex items-center gap-1 bg-[#0B0218] p-1 rounded-xl border border-purple-900/70">
+              <button
+                type="button"
+                onClick={() => setScopeFilter('all')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  scopeFilter === 'all'
+                    ? 'bg-purple-900/90 text-white border border-[#34d399]/60 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>Todas</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setScopeFilter('international')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  scopeFilter === 'international'
+                    ? 'bg-purple-600 text-white font-black shadow-[0_0_12px_rgba(139,124,246,0.5)]'
+                    : 'text-purple-300 hover:text-white hover:bg-purple-950/40'
+                }`}
+              >
+                <span>✈️ Internacionais</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setScopeFilter('domestic')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  scopeFilter === 'domestic'
+                    ? 'bg-[#34d399] text-slate-950 font-black shadow-[0_0_12px_rgba(52,211,153,0.35)]'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>🇧🇷 Nacionais</span>
               </button>
             </div>
 

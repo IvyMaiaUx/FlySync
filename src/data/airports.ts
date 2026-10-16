@@ -71,15 +71,25 @@ export const AIRPORTS: AirportItem[] = [
   { iata: 'EZE', city: 'Buenos Aires', name: 'Aeropuerto Internacional Ministro Pistarini (Ezeiza)', country: 'Argentina', popular: true },
   { iata: 'AEP', city: 'Buenos Aires', name: 'Aeroparque Jorge Newbery', country: 'Argentina', popular: true },
   { iata: 'SCL', city: 'Santiago', name: 'Aeropuerto Internacional Arturo Merino Benítez', country: 'Chile', popular: true },
+  { iata: 'BRC', city: 'Bariloche', name: 'Aeropuerto Internacional Teniente Luis Candelaria', country: 'Argentina', popular: true },
+  { iata: 'MDZ', city: 'Mendoza', name: 'Aeropuerto Internacional El Plumerillo', country: 'Argentina', popular: true },
   { iata: 'MVD', city: 'Montevidéu', name: 'Aeropuerto Internacional de Carrasco', country: 'Uruguai', popular: true },
   { iata: 'BOG', city: 'Bogotá', name: 'Aeropuerto Internacional El Dorado', country: 'Colômbia' },
   { iata: 'LIM', city: 'Lima', name: 'Aeropuerto Internacional Jorge Chávez', country: 'Peru' },
 
-  // Oriente Médio & Ásia
+  // Caribe & América Central
+  { iata: 'CUN', city: 'Cancún', name: 'Aeropuerto Internacional de Cancún', country: 'México', popular: true },
+  { iata: 'PUJ', city: 'Punta Cana', name: 'Aeropuerto Internacional de Punta Cana', country: 'República Dominicana', popular: true },
+  { iata: 'CUR', city: 'Curaçao', name: 'Curaçao International Airport (Hato)', country: 'Curaçao' },
+  { iata: 'NAS', city: 'Nassau', name: 'Lynden Pindling International Airport', country: 'Bahamas' },
+
+  // Oriente Médio, África & Ásia
   { iata: 'DXB', city: 'Dubai', name: 'Dubai International Airport', country: 'Emirados Árabes', popular: true },
   { iata: 'DOH', city: 'Doha', name: 'Hamad International Airport', country: 'Catar', popular: true },
   { iata: 'IST', city: 'Istambul', name: 'Istanbul Airport', country: 'Turquia' },
-  { iata: 'NRT', city: 'Tóquio', name: 'Narita International Airport', country: 'Japão' }
+  { iata: 'JNB', city: 'Joanesburgo', name: 'O. R. Tambo International Airport', country: 'África do Sul' },
+  { iata: 'NRT', city: 'Tóquio', name: 'Narita International Airport', country: 'Japão', popular: true },
+  { iata: 'HND', city: 'Tóquio', name: 'Haneda International Airport', country: 'Japão' }
 ];
 
 import globalIataData from './iata_global.json';
