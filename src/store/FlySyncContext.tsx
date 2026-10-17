@@ -490,10 +490,12 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const signUp = async (email: string, pass: string, displayName?: string): Promise<{ success: boolean; error?: string; message?: string }> => {
     try {
+      const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/` : undefined;
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password: pass,
         options: {
+          emailRedirectTo: redirectUrl,
           data: {
             display_name: displayName?.trim() || email.split('@')[0]
           }
