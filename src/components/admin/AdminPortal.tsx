@@ -89,11 +89,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
     e.preventDefault();
     setIsLoggingIn(true);
     setLoginError(null);
-    if (isAdminEmail(adminEmail)) {
-      adminDirectLogin(adminEmail);
-      setIsLoggingIn(false);
-      return;
-    }
     const res = await signIn(adminEmail, adminPassword);
     setIsLoggingIn(false);
     if (!res.success) {
@@ -149,9 +144,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
     }
   };
 
-  // 1. Guard de Acesso: Se o usuário atual já for admin, libera o acesso direto sem pedir senha!
-  const isCurrentAdmin = user.role === 'admin' || isAdminEmail(user.email);
-  if (!isAuthenticated && !isCurrentAdmin) {
+  // 1. Guard de Acesso: Exige autenticação com senha para acesso ao Backoffice
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-[#070114] text-white flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden font-sans">
         <div className="fixed top-1/4 left-1/3 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -166,7 +160,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
             </div>
             <h1 className="text-xl font-black text-white tracking-tight">Portal do Administrador</h1>
             <p className="text-xs text-purple-300">
-              Área de backoffice restrita para engenharia de coleta e curadoria do FlySync.
+              Área restrita de backoffice. Digite suas credenciais para continuar.
             </p>
           </div>
 
@@ -191,16 +185,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block font-semibold text-purple-200">Senha de Acesso</label>
-                <span className="text-[10px] text-amber-300 font-mono">Padrão: admin123</span>
-              </div>
+              <label className="block font-semibold text-purple-200 mb-1">Senha de Acesso</label>
               <input
                 type="password"
                 required
                 value={adminPassword}
                 onChange={(e) => setAdminPassword(e.target.value)}
-                placeholder="admin123"
+                placeholder="••••••••"
                 className="w-full px-3.5 py-2.5 bg-[#180838] border border-purple-800 rounded-xl text-white focus:ring-2 focus:ring-[#22C55E] focus:outline-hidden"
               />
             </div>
@@ -212,15 +203,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onBackToApp }) => {
             >
               <Lock className="w-4 h-4" />
               <span>{isLoggingIn ? 'Verificando permissões...' : 'Entrar no Backoffice'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => adminDirectLogin(adminEmail)}
-              className="w-full py-2.5 bg-purple-900/40 hover:bg-purple-900/80 border border-purple-700/60 text-purple-200 hover:text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>Entrar com 1 Clique (Ivy Maia - Admin)</span>
             </button>
           </form>
 

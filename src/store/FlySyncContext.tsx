@@ -439,22 +439,14 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const signIn = async (email: string, pass: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const cleanEmail = email.trim().toLowerCase();
+      const cleanPass = pass.trim();
 
-      // If it is an authorized admin email, ALWAYS grant immediate admin access!
-      if (isAdminEmail(cleanEmail)) {
-        try {
-          const { data } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: pass });
-          if (data?.user) {
-            await fetchUserData(data.user.id);
-          }
-        } catch {
-          // ignore error
-        }
-        adminDirectLogin(cleanEmail);
-        return { success: true };
+      if (!cleanEmail || !cleanPass) {
+        return { success: false, error: 'Por favor, informe e-mail e senha.' };
       }
 
-      const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: pass });
+      // 1. Autenticação oficial e estrita no Supabase Auth
+      const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: cleanPass });
       if (!error && data.user) {
         await fetchUserData(data.user.id);
         return { success: true };
@@ -462,10 +454,6 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       return { success: false, error: friendlyError(error) };
     } catch (e) {
-      if (isAdminEmail(email)) {
-        adminDirectLogin(email);
-        return { success: true };
-      }
       return { success: false, error: friendlyError(e) };
     }
   };
