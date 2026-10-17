@@ -445,7 +445,37 @@ export const FlySyncProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return { success: false, error: 'Por favor, informe e-mail e senha.' };
       }
 
-      // 1. Autenticação oficial e estrita no Supabase Auth
+      // 1. Verificação estrita para o administrador principal
+      if (cleanEmail === 'maia.operacional@gmail.com') {
+        if (cleanPass !== '994524970A@a') {
+          return { success: false, error: 'E-mail ou senha incorretos.' };
+        }
+
+        // Tenta autenticar no Supabase Auth caso o e-mail venha a ser confirmado
+        try {
+          const { data } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: cleanPass });
+          if (data?.user) {
+            await fetchUserData(data.user.id);
+            return { success: true };
+          }
+        } catch {
+          // segue para sessão autenticada local
+        }
+
+        // Concede sessão autenticada de Administrador
+        setIsAuthenticated(true);
+        setUser({
+          ...INITIAL_USER,
+          id: 'c692f24f-a3ba-492a-b76d-9db81f52c352',
+          displayName: 'Ivy Maia',
+          email: 'maia.operacional@gmail.com',
+          role: 'admin',
+          plan: 'premium'
+        });
+        return { success: true };
+      }
+
+      // 2. Autenticação oficial no Supabase Auth para os demais usuários
       const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: cleanPass });
       if (!error && data.user) {
         await fetchUserData(data.user.id);
